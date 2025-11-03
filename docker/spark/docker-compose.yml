@@ -32,7 +32,7 @@ services:
       - --name
       - Spark Connect server
       - --master
-      - spark://spark:7077
+      - local[2]  # local mode, 2 cores
       - --conf
       - spark.connect.grpc.binding.address=0.0.0.0
       - --conf
