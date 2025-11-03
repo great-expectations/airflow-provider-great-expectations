@@ -36,7 +36,6 @@ class TestExampleDag:
         dag = dag_bag.get_dag(dag_id)
         assert dag
 
-        dag.clear()
         dag_run = dag.test()
 
         assert dag_run.get_state() == DagRunState.SUCCESS
@@ -50,7 +49,6 @@ class TestBatchParametersDag:
         dag = dag_bag.get_dag(dag_id)
         assert dag
 
-        dag.clear()
         dag_run = dag.test()
 
         assert dag_run.get_state() == DagRunState.SUCCESS
