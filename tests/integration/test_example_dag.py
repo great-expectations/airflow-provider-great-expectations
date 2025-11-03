@@ -35,6 +35,7 @@ class TestExampleDag:
         dag_bag = get_dag_bag()
         dag = dag_bag.get_dag(dag_id)
         assert dag
+        dag.sync_to_db()
 
         dag_run = dag.test()
 
@@ -48,6 +49,7 @@ class TestBatchParametersDag:
         dag_bag = get_dag_bag()
         dag = dag_bag.get_dag(dag_id)
         assert dag
+        dag.sync_to_db()
 
         dag_run = dag.test()
 
