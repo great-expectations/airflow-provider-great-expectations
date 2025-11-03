@@ -1,13 +1,41 @@
 services:
   spark:
-    image: docker.io/apache/spark@sha256:fb5c5e61e7bb1be94b7f3a31afe1f73c5b4d20b6008f4ffa7278fc085da08a9e
+    image: apache/spark:3.5.2-java17
+    container_name: spark
+    environment:
+      SPARK_NO_DAEMONIZE: "true"          # keep master in foreground
     ports:
-      - "9090:8080"
-      - "7077:7077"
+      - "9090:8080"                       # Master UI
+      - "7077:7077"                       # Master RPC
+    command: ["/opt/spark/sbin/start-master.sh", "--host", "0.0.0.0"]
+    healthcheck:
+      test: ["CMD", "bash", "-lc", "curl -fsS http://localhost:8080 >/dev/null"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   spark-connect:
-    image: docker.io/apache/spark@sha256:fb5c5e61e7bb1be94b7f3a31afe1f73c5b4d20b6008f4ffa7278fc085da08a9e
+    image: apache/spark:3.5.2-java17
+    container_name: spark-connect
+    depends_on:
+      spark:
+        condition: service_healthy
+    environment:
+      SPARK_NO_DAEMONIZE: "true"          # keep connect server in foreground
     ports:
       - "15002:15002"
-    # See https://spark.apache.org/docs/latest/spark-connect-overview.html#download-and-start-spark-server-with-spark-connect
-    command: ./sbin/start-connect-server.sh --packages org.apache.spark:spark-connect_2.12:3.5.2
+    # Avoid Maven coordinate resolution; hand Spark the jar URL directly.
+    command:
+      - /opt/spark/bin/spark-submit
+      - --class
+      - org.apache.spark.sql.connect.service.SparkConnectServer
+      - --name
+      - Spark Connect server
+      - --master
+      - spark://spark:7077
+      - --conf
+      - spark.connect.grpc.binding.address=0.0.0.0
+      - --conf
+      - spark.connect.grpc.binding.port=15002
+      - --jars
+      - https://repo1.maven.org/maven2/org/apache/spark/spark-connect_2.12/3.5.2/spark-connect_2.12-3.5.2.jar
