@@ -12,7 +12,7 @@ authors = [
 ]
 license = "Apache-2.0"
 license-files = { paths = ["LICENSE"] }
-requires-python = ">3.9, <=3.13"
+requires-python = ">3.9, <3.14"
 keywords = ["airflow", "great expectations", "provider"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -23,7 +23,6 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",

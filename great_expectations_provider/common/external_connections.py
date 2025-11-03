@@ -7,8 +7,8 @@ import logging
 from pathlib import Path
 from typing import Literal, Optional, Union
 
-from airflow.hooks.base import BaseHook
-from airflow.models import Connection
+from airflow.sdk import BaseHook
+from airflow.sdk.definitions.connection import Connection
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
