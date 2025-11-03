@@ -13,10 +13,7 @@ class IncompleteGXCloudConfigError(AirflowException):
     """Great Expectations connection configuration is not complete.
 
     Attributes:
-        xcom_location: Location of the full validation result in Airflow XCom
-        statistics: Validation statistics if available
-        failed_expectation_types: List of expectation types that failed (max 10, unique)
-        context: Full context dictionary
+        missing_keys: Required configuration keys which were not provided.
     """
 
     def __init__(
