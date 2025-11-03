@@ -1,12 +1,17 @@
+from __future__ import annotations
+
 import logging
 from functools import cache
+from typing import TYPE_CHECKING
 
 import pytest
 from airflow.models.dagbag import DagBag
 from airflow.utils.db import create_default_connections
 from airflow.utils.session import NEW_SESSION, provide_session
 from airflow.utils.state import DagRunState, State
-from sqlalchemy.orm import Session
+
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
 pytestmark = pytest.mark.integration
 
@@ -30,26 +35,24 @@ def session():
 
 
 class TestExampleDag:
-    def test_example_dag(self, session: Session):
+    def test_example_dag(self, session: Session, dag_maker):
         dag_id = "gx_provider_example_dag"
-        dag_bag = get_dag_bag()
-        dag = dag_bag.get_dag(dag_id)
-        assert dag
 
-        dag_run = dag.test()
+        with dag_maker(dag_id=dag_id) as dag:
+            dag_run = dag.test()
 
-        assert dag_run.get_state() == DagRunState.SUCCESS
-        assert all([ti.state == State.SUCCESS for ti in dag_run.get_task_instances()])
+            assert dag_run.get_state() == DagRunState.SUCCESS
+            assert all(
+                [ti.state == State.SUCCESS for ti in dag_run.get_task_instances()]
+            )
 
 
 class TestBatchParametersDag:
-    def test(self, session: Session):
+    def test(self, session: Session, dag_maker):
         dag_id = "gx_provider_example_dag_with_batch_parameters"
-        dag_bag = get_dag_bag()
-        dag = dag_bag.get_dag(dag_id)
-        assert dag
 
-        dag_run = dag.test()
+        with dag_maker(dag_id=dag_id) as dag:
+            dag_run = dag.test()
 
         assert dag_run.get_state() == DagRunState.SUCCESS
         assert all([ti.state == State.SUCCESS for ti in dag_run.get_task_instances()])
