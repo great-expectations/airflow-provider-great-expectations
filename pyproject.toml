@@ -33,6 +33,7 @@ dependencies = [
     "great-expectations>=1.7.0, <2.0",
     "apache-airflow>=2.1",
     "setuptools>=41.0.0",
+    "structlog < 25.5.0"  # temporary workaround https://github.com/apache/airflow/pull/57335
 ]
 
 [project.optional-dependencies]
