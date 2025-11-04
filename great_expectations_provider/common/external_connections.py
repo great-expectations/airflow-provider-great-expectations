@@ -11,8 +11,10 @@ try:  # airflow 3
     from airflow.sdk import BaseHook
     from airflow.sdk.definitions.connection import Connection
 except ImportError:  # airflow 2
-    from airflow.hooks.base import BaseHook
-    from airflow.models import Connection
+    from airflow.hooks.base import BaseHook  # type: ignore[attr-defined,no-redef]
+    from airflow.models import (
+        Connection,  # type: ignore[attr-defined,no-redef,assignment]
+    )
 
 from pydantic import BaseModel, Field
 
