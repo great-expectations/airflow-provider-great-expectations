@@ -11,8 +11,8 @@ try:  # airflow 3
     from airflow.sdk.bases.operator import chain
 except ImportError:  # airflow 2
     from airflow.decorators import task  # type: ignore[attr-defined,no-redef]
-    from airflow.models.baseoperator import (
-        chain,  # type: ignore[import-not-found,no-redef]
+    from airflow.models.baseoperator import (  # type: ignore[import-not-found,no-redef]
+        chain,
     )
 
 from great_expectations import Checkpoint, ExpectationSuite, ValidationDefinition

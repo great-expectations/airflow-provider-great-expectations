@@ -9,8 +9,8 @@ from airflow import DAG
 try:
     from airflow.sdk.bases.operator import chain
 except ImportError:
-    from airflow.models.baseoperator import (
-        chain,  # type: ignore[import-not-found,no-redef]
+    from airflow.models.baseoperator import (  # type: ignore[import-not-found,no-redef]
+        chain,
     )
 
 
