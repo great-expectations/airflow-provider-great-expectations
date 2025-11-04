@@ -4,7 +4,12 @@ from dataclasses import dataclass
 from typing import Any
 
 from airflow.exceptions import AirflowException
-from airflow.sdk import BaseHook
+
+try:  # airflow 3
+    from airflow.sdk import BaseHook
+except ImportError:  # airflow 2
+    from airflow.hooks.base import BaseHook  # type: ignore[attr-defined,no-redef]
+
 
 from great_expectations_provider.common.gx_context_actions import load_data_context
 
