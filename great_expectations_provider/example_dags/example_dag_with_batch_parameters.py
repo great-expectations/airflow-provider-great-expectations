@@ -5,8 +5,16 @@ from typing import TYPE_CHECKING
 
 import great_expectations.expectations as gxe
 from airflow import DAG
-from airflow.sdk import task
-from airflow.sdk.bases.operator import chain
+
+try:  # airflow 3
+    from airflow.sdk import task
+    from airflow.sdk.bases.operator import chain
+except ImportError:  # airflow 2
+    from airflow.decorators import task  # type: ignore[attr-defined,no-redef]
+    from airflow.models.baseoperator import (
+        chain,  # type: ignore[import-not-found,no-redef]
+    )
+
 from great_expectations import Checkpoint, ExpectationSuite, ValidationDefinition
 
 from great_expectations_provider.operators.validate_batch import GXValidateBatchOperator
