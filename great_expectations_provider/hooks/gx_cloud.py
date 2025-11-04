@@ -37,6 +37,7 @@ class IncompleteGXCloudConfigError(AirflowException):
 class GXCloudConfig:
     cloud_access_token: str
     cloud_organization_id: str
+    cloud_workspace_id: str
 
 
 class GXCloudHook(BaseHook):
@@ -57,27 +58,39 @@ class GXCloudHook(BaseHook):
 
     def get_conn(self) -> GXCloudConfig:  # type: ignore[override]
         config = self.get_connection(self.gx_cloud_conn_id)
-        if not config.password or not config.login:
-            missing_keys = []
-            if not config.password:
-                missing_keys.append("GX Cloud Access Token")
-            if not config.login:
-                missing_keys.append("GX Cloud Organization ID")
+        missing_keys = []
+        if not config.password:
+            missing_keys.append("GX Cloud Access Token")
+        if not config.login:
+            missing_keys.append("GX Cloud Organization ID")
+
+        # Extract cloud_workspace_id from extra field
+        cloud_workspace_id = config.extra_dejson.get("cloud_workspace_id")
+        if not cloud_workspace_id:
+            missing_keys.append("GX Cloud Workspace ID")
+
+        if missing_keys:
             raise IncompleteGXCloudConfigError(missing_keys)
+
         return GXCloudConfig(
-            cloud_access_token=config.password, cloud_organization_id=config.login
+            cloud_access_token=config.password,
+            cloud_organization_id=config.login,
+            cloud_workspace_id=cloud_workspace_id,
         )
 
     @classmethod
     def get_ui_field_behaviour(cls) -> dict[str, Any]:
         """Return custom field behaviour."""
         return {
-            "hidden_fields": ["schema", "port", "extra", "host"],
+            "hidden_fields": ["schema", "port", "host"],
             "relabeling": {
                 "login": "GX Cloud Organization ID",
                 "password": "GX Cloud Access Token",
+                "extra": 'GX Cloud Workspace ID (JSON: {"cloud_workspace_id": "your-workspace-id"})',
             },
-            "placeholders": {},
+            "placeholders": {
+                "extra": '{"cloud_workspace_id": "your-workspace-id"}',
+            },
         }
 
     def test_connection(self) -> tuple[bool, str]:

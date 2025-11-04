@@ -22,6 +22,8 @@ class TestGXCloudHookGetConn:
         mock_conn = Mock()
         mock_conn.password = "test_token"
         mock_conn.login = "test_org_id"
+        mock_conn.extra = '{"cloud_workspace_id": "test_workspace_id"}'
+        mock_conn.extra_dejson = {"cloud_workspace_id": "test_workspace_id"}
         mock_get_connection.return_value = mock_conn
 
         hook = GXCloudHook("test_conn")
@@ -30,26 +32,73 @@ class TestGXCloudHookGetConn:
         assert isinstance(result, GXCloudConfig)
         assert result.cloud_access_token == "test_token"
         assert result.cloud_organization_id == "test_org_id"
+        assert result.cloud_workspace_id == "test_workspace_id"
         mock_get_connection.assert_called_once_with("test_conn")
 
     @patch("great_expectations_provider.hooks.gx_cloud.BaseHook.get_connection")
     @pytest.mark.parametrize(
-        "password,login,expected_missing_keys",
+        "password,login,extra,expected_missing_keys",
         [
-            (None, "test_org_id", ["GX Cloud Access Token"]),
-            ("test_token", None, ["GX Cloud Organization ID"]),
-            (None, None, ["GX Cloud Access Token", "GX Cloud Organization ID"]),
-            ("", "test_org_id", ["GX Cloud Access Token"]),
-            ("test_token", "", ["GX Cloud Organization ID"]),
+            (
+                None,
+                "test_org_id",
+                '{"cloud_workspace_id": "test_workspace"}',
+                ["GX Cloud Access Token"],
+            ),
+            (
+                "test_token",
+                None,
+                '{"cloud_workspace_id": "test_workspace"}',
+                ["GX Cloud Organization ID"],
+            ),
+            (
+                None,
+                None,
+                '{"cloud_workspace_id": "test_workspace"}',
+                ["GX Cloud Access Token", "GX Cloud Organization ID"],
+            ),
+            (
+                "",
+                "test_org_id",
+                '{"cloud_workspace_id": "test_workspace"}',
+                ["GX Cloud Access Token"],
+            ),
+            (
+                "test_token",
+                "",
+                '{"cloud_workspace_id": "test_workspace"}',
+                ["GX Cloud Organization ID"],
+            ),
+            ("test_token", "test_org_id", None, ["GX Cloud Workspace ID"]),
+            ("test_token", "test_org_id", "", ["GX Cloud Workspace ID"]),
+            ("test_token", "test_org_id", "{}", ["GX Cloud Workspace ID"]),
+            (
+                "test_token",
+                "test_org_id",
+                '{"other_key": "value"}',
+                ["GX Cloud Workspace ID"],
+            ),
         ],
     )
     def test_get_conn_error(
-        self, mock_get_connection, password, login, expected_missing_keys
+        self, mock_get_connection, password, login, extra, expected_missing_keys
     ):
         """Test that IncompleteGXCloudConfigError is raised when params are not provided."""
         mock_conn = Mock()
         mock_conn.password = password
         mock_conn.login = login
+        mock_conn.extra = extra
+        if extra:
+            try:
+                import json
+
+                mock_conn.extra_dejson = (
+                    json.loads(extra) if isinstance(extra, str) else extra
+                )
+            except (json.JSONDecodeError, TypeError):
+                mock_conn.extra_dejson = {}
+        else:
+            mock_conn.extra_dejson = {}
         mock_get_connection.return_value = mock_conn
 
         hook = GXCloudHook("test_conn")

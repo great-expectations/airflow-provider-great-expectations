@@ -62,6 +62,7 @@ def load_data_context(
             mode="cloud",
             cloud_access_token=gx_cloud_config.cloud_access_token,
             cloud_organization_id=gx_cloud_config.cloud_organization_id,
+            cloud_workspace_id=gx_cloud_config.cloud_workspace_id,
             user_agent_str=USER_AGENT_STR,
         )
     else:
