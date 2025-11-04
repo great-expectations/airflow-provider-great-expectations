@@ -21,13 +21,21 @@ jobs:
     permissions:
       contents: read
     steps:
-      - run: true
+      - run: "true"
 
   integration-test:
     needs: Authorize
     runs-on: ubuntu-latest
     permissions:
       contents: read
+
+    strategy:
+      matrix:
+        airflow-version: ["2.11.0", "3.1.1"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        exclude:
+          - airflow-version: "2.11.0"
+            python-version: "3.13"
 
     env:
       GX_CLOUD_ORGANIZATION_ID: ${{ secrets.GX_CLOUD_ORGANIZATION_ID }}
@@ -36,6 +44,8 @@ jobs:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
       POSTGRES_PORT: 5433  # Using 5433 to avoid conflict with local postgres
+      AIRFLOW__CORE__DAGS_FOLDER: ${{ github.workspace }}/great_expectations_provider/example_dags
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
 
     services:
       postgres:
@@ -56,7 +66,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
@@ -64,12 +74,20 @@ jobs:
           version: "0.7.13"
 
       - name: Install dependencies
-        run: uv pip install --system -e ".[postgresql,tests]"
+        run: uv pip install --system "apache-airflow==${{ matrix.airflow-version }}" -e ".[postgresql,tests]"
 
       - name: Setup
         run: |
           airflow db reset -y
           airflow db migrate
+
+      - name: Test Example DAGs via Airflow CLI
+        run: |
+          # Test the main example DAG
+          airflow dags test gx_provider_example_dag 2024-01-01
+
+          # Test the batch parameters DAG
+          airflow dags test gx_provider_example_dag_with_batch_parameters 2024-01-01
 
       - name: Run Regular Integration Tests
         run: pytest -vvv -m integration tests/integration
@@ -97,7 +115,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.13"
 
       - name: Install uv
         uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
@@ -124,6 +142,7 @@ jobs:
     env:
       GX_CLOUD_ORGANIZATION_ID: ${{ secrets.GX_CLOUD_ORGANIZATION_ID }}
       GX_CLOUD_ACCESS_TOKEN: ${{ secrets.GX_CLOUD_ACCESS_TOKEN }}
+      GX_CLOUD_WORKSPACE_ID: ${{ secrets.GX_CLOUD_WORKSPACE_ID }}
 
     steps:
       - name: Checkout
@@ -138,7 +157,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.13"
 
       - name: Install uv
         uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
