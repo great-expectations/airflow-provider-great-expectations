@@ -18,6 +18,14 @@ def get_provider_info():
                 "connection-type": "gx_cloud",
                 "hook-class-name": "great_expectations_provider.hooks.gx_cloud.GXCloudHook",
                 "hook-name": "Great Expectations Cloud",
+                "ui_field_behaviour": {
+                    "hidden_fields": ["port", "host", "extra"],
+                    "relabeling": {
+                        "login": "GX Cloud Organization ID",
+                        "password": "GX Cloud Access Token",
+                        "schema": "GX Cloud Workspace ID",
+                    },
+                },
             }
         ],
     }

@@ -37,6 +37,7 @@ class IncompleteGXCloudConfigError(AirflowException):
 class GXCloudConfig:
     cloud_access_token: str
     cloud_organization_id: str
+    cloud_workspace_id: str
 
 
 class GXCloudHook(BaseHook):
@@ -57,27 +58,33 @@ class GXCloudHook(BaseHook):
 
     def get_conn(self) -> GXCloudConfig:  # type: ignore[override]
         config = self.get_connection(self.gx_cloud_conn_id)
-        if not config.password or not config.login:
-            missing_keys = []
-            if not config.password:
-                missing_keys.append("GX Cloud Access Token")
-            if not config.login:
-                missing_keys.append("GX Cloud Organization ID")
+        missing_keys = []
+        if not config.password:
+            missing_keys.append("GX Cloud Access Token")
+        if not config.login:
+            missing_keys.append("GX Cloud Organization ID")
+        if not config.schema:
+            missing_keys.append("GX Cloud Workspace ID")
+
+        if missing_keys:
             raise IncompleteGXCloudConfigError(missing_keys)
+
         return GXCloudConfig(
-            cloud_access_token=config.password, cloud_organization_id=config.login
+            cloud_access_token=config.password,  # type: ignore[arg-type]
+            cloud_organization_id=config.login,  # type: ignore[arg-type]
+            cloud_workspace_id=config.schema,  # type: ignore[arg-type]
         )
 
     @classmethod
     def get_ui_field_behaviour(cls) -> dict[str, Any]:
         """Return custom field behaviour."""
         return {
-            "hidden_fields": ["schema", "port", "extra", "host"],
+            "hidden_fields": ["port", "host", "extra"],
             "relabeling": {
                 "login": "GX Cloud Organization ID",
+                "schema": "GX Cloud Workspace ID",
                 "password": "GX Cloud Access Token",
             },
-            "placeholders": {},
         }
 
     def test_connection(self) -> tuple[bool, str]:
