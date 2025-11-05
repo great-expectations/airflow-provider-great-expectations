@@ -17,7 +17,7 @@ class TestGXCloudHookGetConn:
     """Test class for GXCloudHook.get_conn method."""
 
     @patch("great_expectations_provider.hooks.gx_cloud.BaseHook.get_connection")
-    def test_get_conn_success(self, mock_get_connection):
+    def test_get_conn_success(self, mock_get_connection: Mock) -> None:
         """Test successful connection retrieval with all required parameters."""
         mock_conn = Mock()
         mock_conn.password = "test_token"
@@ -74,8 +74,13 @@ class TestGXCloudHookGetConn:
         ],
     )
     def test_get_conn_error(
-        self, mock_get_connection, password, login, schema, expected_missing_keys
-    ):
+        self,
+        mock_get_connection: Mock,
+        password: str | None,
+        login: str | None,
+        schema: str | None,
+        expected_missing_keys: list[str],
+    ) -> None:
         """Test that IncompleteGXCloudConfigError is raised when params are not provided."""
         mock_conn = Mock()
         mock_conn.password = password
