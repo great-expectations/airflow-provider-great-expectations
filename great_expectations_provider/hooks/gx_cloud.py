@@ -79,7 +79,7 @@ class GXCloudHook(BaseHook):
     def get_ui_field_behaviour(cls) -> dict[str, Any]:
         """Return custom field behaviour."""
         return {
-            "hidden_fields": ["port", "host"],
+            "hidden_fields": ["port", "host", "extra"],
             "relabeling": {
                 "login": "GX Cloud Organization ID",
                 "schema": "GX Cloud Workspace ID",
