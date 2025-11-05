@@ -70,9 +70,9 @@ class GXCloudHook(BaseHook):
             raise IncompleteGXCloudConfigError(missing_keys)
 
         return GXCloudConfig(
-            cloud_access_token=config.password,
-            cloud_organization_id=config.login,
-            cloud_workspace_id=config.schema,
+            cloud_access_token=config.password,  # type: ignore[arg-type]
+            cloud_organization_id=config.login,  # type: ignore[arg-type]
+            cloud_workspace_id=config.schema,  # type: ignore[arg-type]
         )
 
     @classmethod
