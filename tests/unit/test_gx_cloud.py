@@ -22,8 +22,8 @@ class TestGXCloudHookGetConn:
         mock_conn = Mock()
         mock_conn.password = "test_token"
         mock_conn.login = "test_org_id"
-        mock_conn.extra = '{"cloud_workspace_id": "test_workspace_id"}'
-        mock_conn.extra_dejson = {"cloud_workspace_id": "test_workspace_id"}
+        mock_conn.schema = "test_workspace_id"
+
         mock_get_connection.return_value = mock_conn
 
         hook = GXCloudHook("test_conn")
