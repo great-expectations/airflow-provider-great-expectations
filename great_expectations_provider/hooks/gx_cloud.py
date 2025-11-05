@@ -63,10 +63,7 @@ class GXCloudHook(BaseHook):
             missing_keys.append("GX Cloud Access Token")
         if not config.login:
             missing_keys.append("GX Cloud Organization ID")
-
-        # Extract cloud_workspace_id from extra field
-        cloud_workspace_id = config.extra_dejson.get("cloud_workspace_id")
-        if not cloud_workspace_id:
+        if not config.schema:
             missing_keys.append("GX Cloud Workspace ID")
 
         if missing_keys:
@@ -75,21 +72,18 @@ class GXCloudHook(BaseHook):
         return GXCloudConfig(
             cloud_access_token=config.password,
             cloud_organization_id=config.login,
-            cloud_workspace_id=cloud_workspace_id,
+            cloud_workspace_id=config.schema,
         )
 
     @classmethod
     def get_ui_field_behaviour(cls) -> dict[str, Any]:
         """Return custom field behaviour."""
         return {
-            "hidden_fields": ["schema", "port", "host"],
+            "hidden_fields": ["port", "host"],
             "relabeling": {
                 "login": "GX Cloud Organization ID",
+                "schema": "GX Cloud Workspace ID",
                 "password": "GX Cloud Access Token",
-                "extra": 'GX Cloud Workspace ID (JSON: {"cloud_workspace_id": "your-workspace-id"})',
-            },
-            "placeholders": {
-                "extra": '{"cloud_workspace_id": "your-workspace-id"}',
             },
         }
 
