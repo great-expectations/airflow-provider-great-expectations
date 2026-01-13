@@ -14,8 +14,10 @@ Configure these in GitHub repository settings under **Settings > Secrets and var
 
 | Variable Name | Description |
 |--------------|-------------|
-| `GX_CLOUD_ORGANIZATION_ID` | The organization ID (visible in GX Cloud UI, URLs, or existing GitHub variables) |
-| `GX_CLOUD_WORKSPACE_ID` | A workspace ID within the test organization |
+| `GX_CLOUD_ORGANIZATION_ID` | The organization ID for the test organization |
+| `GX_CLOUD_WORKSPACE_ID` | A workspace ID for the test organization |
+
+Both IDs are visible in the GX Cloud UI, URLs, or existing GitHub variables.
 
 ### Secrets
 
