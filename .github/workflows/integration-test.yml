@@ -11,7 +11,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-
 jobs:
   Authorize:
     environment: ${{ github.event_name == 'pull_request' &&
@@ -141,8 +140,8 @@ jobs:
 
     env:
       GX_CLOUD_ORGANIZATION_ID: ${{ vars.GX_CLOUD_ORGANIZATION_ID }}
-      GX_CLOUD_ACCESS_TOKEN: ${{ secrets.GX_CLOUD_ACCESS_TOKEN }}
       GX_CLOUD_WORKSPACE_ID: ${{ vars.GX_CLOUD_WORKSPACE_ID }}
+      GX_CLOUD_ACCESS_TOKEN: ${{ secrets.GX_CLOUD_ACCESS_TOKEN }}
 
     steps:
       - name: Checkout
