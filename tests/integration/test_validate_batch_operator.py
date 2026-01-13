@@ -13,12 +13,11 @@ from great_expectations_provider.common.errors import GXValidationFailed
 from great_expectations_provider.operators.validate_batch import GXValidateBatchOperator
 from tests.integration.conftest import rand_name
 
-pytestmark = pytest.mark.integration
-
 
 class TestValidateBatchOperator:
     COL_NAME = "my_column"
 
+    @pytest.mark.integration
     def test_with_cloud_context(
         self,
         ensure_data_source_cleanup: Callable[[str], None],
@@ -58,6 +57,7 @@ class TestValidateBatchOperator:
         pushed_result = mock_ti.xcom_push.call_args[1]["value"]
         assert pushed_result["success"] is True
 
+    @pytest.mark.integration
     def test_file_system_data_source(
         self,
         load_csv_data: Callable[[Path, list[dict]], None],
@@ -161,6 +161,7 @@ class TestValidateBatchOperator:
         pushed_result = mock_ti.xcom_push.call_args[1]["value"]
         assert pushed_result["success"] is True
 
+    @pytest.mark.integration
     def test_validation_failure_raises_exception(self) -> None:
         """Test that validation failure raises GXValidationFailed exception."""
         task_id = f"validate_batch_failure_integration_test_{rand_name()}"
@@ -193,6 +194,7 @@ class TestValidateBatchOperator:
         with pytest.raises(GXValidationFailed):
             validate_batch.execute(context={"ti": mock_ti})
 
+    @pytest.mark.integration
     def test_validation_failure_xcom_contains_result(self) -> None:
         """Test that when validation fails and exception is raised, xcom still contains the failed result."""
         task_id = f"validate_batch_failure_xcom_integration_test_{rand_name()}"

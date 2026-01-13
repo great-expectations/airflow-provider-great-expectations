@@ -100,6 +100,30 @@ pytest -m integration tests/integration
 
 For details on the test organization used in CI (and how to get access), see [CI_SECRETS.md](https://github.com/astronomer/airflow-provider-great-expectations/blob/main/CI_SECRETS.md).
 
+### Running postgres tests
+
+Postgres tests use a separate marker and require a running Postgres instance plus the `postgresql` optional dependency:
+
+```bash
+pip install -e '.[postgresql,tests]'
+export POSTGRES_USER=postgres
+export POSTGRES_PASSWORD=postgres
+export POSTGRES_DB=postgres
+export POSTGRES_PORT=5432
+pytest -m postgres tests/integration
+```
+
+### Running spark tests
+
+Spark tests run in separate CI jobs and use different markers. To run them locally, install the `spark` optional dependency and start Spark via Docker Compose:
+
+```bash
+pip install -e '.[spark,tests]'
+docker compose -f docker/spark/docker-compose.yml up -d
+pytest -m spark_integration tests/integration
+pytest -m spark_connect_integration tests/integration
+```
+
 
 ## Write docs
 

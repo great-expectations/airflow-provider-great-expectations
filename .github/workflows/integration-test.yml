@@ -42,7 +42,7 @@ jobs:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
-      POSTGRES_PORT: 5433  # Using 5433 to avoid conflict with local postgres
+      POSTGRES_PORT: 5433 # Using 5433 to avoid conflict with local postgres
       AIRFLOW__CORE__DAGS_FOLDER: ${{ github.workspace }}/great_expectations_provider/example_dags
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
 
@@ -89,7 +89,7 @@ jobs:
           airflow dags test gx_provider_example_dag_with_batch_parameters 2024-01-01
 
       - name: Run Regular Integration Tests
-        run: pytest -vvv -m integration tests/integration
+        run: pytest -vvv -m "integration or postgres" tests/integration
 
   spark-integration-test:
     needs: Authorize
