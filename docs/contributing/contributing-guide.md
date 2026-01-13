@@ -78,6 +78,27 @@ Test with `pytest`:
    ```
    The `no:warnings` flag filters out deprecation messages that may be issued by Airflow.
 
+### Unit tests vs integration tests
+
+Tests are organized into two categories:
+
+- **Unit tests** (`tests/unit/`): Run without external dependencies and don't require credentials.
+- **Integration tests** (`tests/integration/`): Require GX Cloud credentials and optionally a running Postgres or Spark instance.
+
+To run only unit tests:
+```bash
+pytest tests/unit
+```
+
+To run integration tests locally, set the required environment variables:
+```bash
+export GX_CLOUD_ORGANIZATION_ID="your-org-id"
+export GX_CLOUD_ACCESS_TOKEN="your-access-token"
+pytest -m integration tests/integration
+```
+
+For maintainers setting up CI, see [CI_SECRETS.md](https://github.com/astronomer/airflow-provider-great-expectations/blob/main/CI_SECRETS.md) for credentials configuration.
+
 
 ## Write docs
 
