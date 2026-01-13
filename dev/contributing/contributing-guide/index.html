@@ -716,6 +716,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#running-postgres-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running postgres tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-spark-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running spark tests
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -886,6 +908,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#running-postgres-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running postgres tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-spark-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running spark tests
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1022,16 +1066,32 @@
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>pytest<span class="w"> </span>-m<span class="w"> </span>integration<span class="w"> </span>tests/integration
 </span></code></pre></div></p>
 <p>For details on the test organization used in CI (and how to get access), see <a href="https://github.com/astronomer/airflow-provider-great-expectations/blob/main/CI_SECRETS.md">CI_SECRETS.md</a>.</p>
+<h3 id="running-postgres-tests">Running postgres tests</h3>
+<p>Postgres tests use a separate marker and require a running Postgres instance plus the <code>postgresql</code> optional dependency:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;.[postgresql,tests]&#39;</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">POSTGRES_USER</span><span class="o">=</span>postgres
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">POSTGRES_PASSWORD</span><span class="o">=</span>postgres
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">POSTGRES_DB</span><span class="o">=</span>postgres
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="nb">export</span><span class="w"> </span><span class="nv">POSTGRES_PORT</span><span class="o">=</span><span class="m">5432</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>pytest<span class="w"> </span>-m<span class="w"> </span>postgres<span class="w"> </span>tests/integration
+</span></code></pre></div>
+<h3 id="running-spark-tests">Running spark tests</h3>
+<p>Spark tests run in separate CI jobs and use different markers. To run them locally, install the <code>spark</code> optional dependency and start Spark via Docker Compose:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;.[spark,tests]&#39;</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>docker/spark/docker-compose.yml<span class="w"> </span>up<span class="w"> </span>-d
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>pytest<span class="w"> </span>-m<span class="w"> </span>spark_integration<span class="w"> </span>tests/integration
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>pytest<span class="w"> </span>-m<span class="w"> </span>spark_connect_integration<span class="w"> </span>tests/integration
+</span></code></pre></div>
 <h2 id="write-docs">Write docs</h2>
 <p>We use Markdown to author Great Expectations Airflow Provider documentation. We use hatch to build and release the docs.</p>
 <ol>
 <li>Update Markdown files in the <a href="https://github.com/astronomer/airflow-provider-great-expectations/tree/docs/docs"><code>docs/</code> folder</a>.</li>
 <li>Build and serve the documentation locally to preview your changes.
-   <div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>hatch<span class="w"> </span>run<span class="w"> </span>docs:dev
+   <div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>hatch<span class="w"> </span>run<span class="w"> </span>docs:dev
 </span></code></pre></div></li>
 <li><a href="#overview-of-how-to-contribute">Open an issue and PR</a> for your changes.</li>
 <li>Once approved, release the documentation with the current project version and set it to the latest.
-   <div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>hatch run docs:gh-release
+   <div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>hatch run docs:gh-release
 </span></code></pre></div></li>
 </ol>
 
