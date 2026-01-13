@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.618322db.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
       
 
@@ -702,6 +702,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Run tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unit-tests-vs-integration-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unit tests vs integration tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -855,6 +872,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Run tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unit-tests-vs-integration-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unit tests vs integration tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -972,16 +1006,31 @@
 </span></code></pre></div>
    The <code>no:warnings</code> flag filters out deprecation messages that may be issued by Airflow.</li>
 </ol>
+<h3 id="unit-tests-vs-integration-tests">Unit tests vs integration tests</h3>
+<p>Tests are organized into two categories:</p>
+<ul>
+<li><strong>Unit tests</strong> (<code>tests/unit/</code>): Run without external dependencies and don't require credentials.</li>
+<li><strong>Integration tests</strong> (<code>tests/integration/</code>): Require GX Cloud credentials and optionally a running Postgres or Spark instance.</li>
+</ul>
+<p>To run only unit tests:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pytest<span class="w"> </span>tests/unit
+</span></code></pre></div></p>
+<p>To run integration tests locally, set the required environment variables:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">GX_CLOUD_ORGANIZATION_ID</span><span class="o">=</span><span class="s2">&quot;your-org-id&quot;</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">GX_CLOUD_ACCESS_TOKEN</span><span class="o">=</span><span class="s2">&quot;your-access-token&quot;</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>pytest<span class="w"> </span>-m<span class="w"> </span>integration<span class="w"> </span>tests/integration
+</span></code></pre></div></p>
+<p>For maintainers setting up CI, see <a href="https://github.com/astronomer/airflow-provider-great-expectations/blob/main/CI_SECRETS.md">CI_SECRETS.md</a> for credentials configuration.</p>
 <h2 id="write-docs">Write docs</h2>
 <p>We use Markdown to author Great Expectations Airflow Provider documentation. We use hatch to build and release the docs.</p>
 <ol>
 <li>Update Markdown files in the <a href="https://github.com/astronomer/airflow-provider-great-expectations/tree/docs/docs"><code>docs/</code> folder</a>.</li>
 <li>Build and serve the documentation locally to preview your changes.
-   <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>hatch<span class="w"> </span>run<span class="w"> </span>docs:dev
+   <div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>hatch<span class="w"> </span>run<span class="w"> </span>docs:dev
 </span></code></pre></div></li>
 <li><a href="#overview-of-how-to-contribute">Open an issue and PR</a> for your changes.</li>
 <li>Once approved, release the documentation with the current project version and set it to the latest.
-   <div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>hatch run docs:gh-release
+   <div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>hatch run docs:gh-release
 </span></code></pre></div></li>
 </ol>
 
@@ -1083,10 +1132,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.sections", "navigation.tabs", "navigation.footer", "navigation.indexes", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.sections", "navigation.tabs", "navigation.footer", "navigation.indexes", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
