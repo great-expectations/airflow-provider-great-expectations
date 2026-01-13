@@ -173,6 +173,7 @@ class TestValidateCheckpointOperator:
         pushed_result = mock_ti.xcom_push.call_args[1]["value"]
         assert pushed_result["success"] is True
 
+    @pytest.mark.postgres
     def test_postgres_data_source(
         self,
         table_name: str,
