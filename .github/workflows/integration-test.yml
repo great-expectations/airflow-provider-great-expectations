@@ -38,23 +38,10 @@ jobs:
 
     env:
       GX_CLOUD_ORGANIZATION_ID: ${{ vars.GX_CLOUD_ORGANIZATION_ID }}
+      GX_CLOUD_WORKSPACE_ID: ${{ vars.GX_CLOUD_WORKSPACE_ID }}
       GX_CLOUD_ACCESS_TOKEN: ${{ secrets.GX_CLOUD_ACCESS_TOKEN }}
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-      POSTGRES_PORT: 5433 # Using 5433 to avoid conflict with local postgres
       AIRFLOW__CORE__DAGS_FOLDER: ${{ github.workspace }}/great_expectations_provider/example_dags
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
-
-    services:
-      postgres:
-        image: postgres:13
-        ports:
-          - 5433:5432
-        env:
-          POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ env.POSTGRES_DB }}
 
     steps:
       - name: Checkout
@@ -73,7 +60,7 @@ jobs:
           version: "0.7.13"
 
       - name: Install dependencies
-        run: uv pip install --system "apache-airflow==${{ matrix.airflow-version }}" -e ".[postgresql,tests]"
+        run: uv pip install --system "apache-airflow==${{ matrix.airflow-version }}" -e ".[tests]"
 
       - name: Setup
         run: |
@@ -88,8 +75,60 @@ jobs:
           # Test the batch parameters DAG
           airflow dags test gx_provider_example_dag_with_batch_parameters 2024-01-01
 
-      - name: Run Regular Integration Tests
-        run: pytest -vvv -m "integration or postgres" tests/integration
+      - name: Run Integration Tests
+        run: pytest -vvv -m integration tests/integration
+
+  postgres-integration-test:
+    needs: Authorize
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    env:
+      GX_CLOUD_ORGANIZATION_ID: ${{ vars.GX_CLOUD_ORGANIZATION_ID }}
+      GX_CLOUD_WORKSPACE_ID: ${{ vars.GX_CLOUD_WORKSPACE_ID }}
+      GX_CLOUD_ACCESS_TOKEN: ${{ secrets.GX_CLOUD_ACCESS_TOKEN }}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PORT: 5433
+
+    services:
+      postgres:
+        image: postgres:13
+        ports:
+          - 5433:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
+        with:
+          version: "0.7.13"
+
+      - name: Install dependencies
+        run: uv pip install --system -e ".[postgresql,tests]"
+
+      - name: Setup
+        run: |
+          airflow db reset -y
+          airflow db migrate
+
+      - name: Run Postgres Integration Tests
+        run: pytest -vvv -m postgres tests/integration
 
   spark-integration-test:
     needs: Authorize
@@ -99,6 +138,7 @@ jobs:
 
     env:
       GX_CLOUD_ORGANIZATION_ID: ${{ vars.GX_CLOUD_ORGANIZATION_ID }}
+      GX_CLOUD_WORKSPACE_ID: ${{ vars.GX_CLOUD_WORKSPACE_ID }}
       GX_CLOUD_ACCESS_TOKEN: ${{ secrets.GX_CLOUD_ACCESS_TOKEN }}
 
     steps:
