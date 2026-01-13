@@ -14,8 +14,6 @@ from great_expectations_provider.operators.validate_checkpoint import (
 )
 from tests.integration.conftest import is_valid_gx_cloud_url, rand_name
 
-pytestmark = pytest.mark.integration
-
 
 class TestValidateCheckpointOperator:
     """Test cases for GXValidateCheckpointOperator with different context types."""
@@ -100,6 +98,7 @@ class TestValidateCheckpointOperator:
 
         return _configure_checkpoint
 
+    @pytest.mark.integration
     def test_with_cloud_context(
         self,
         configure_checkpoint_with_cleanup: Callable[
@@ -127,6 +126,7 @@ class TestValidateCheckpointOperator:
             pushed_result["validation_results"][0]["result_url"]
         )
 
+    @pytest.mark.integration
     def test_with_file_context(
         self,
         configure_checkpoint: Callable[[AbstractDataContext], gx.Checkpoint],
@@ -152,6 +152,7 @@ class TestValidateCheckpointOperator:
         pushed_result = mock_ti.xcom_push.call_args[1]["value"]
         assert pushed_result["success"] is True
 
+    @pytest.mark.integration
     def test_with_ephemeral_context(
         self,
         configure_checkpoint: Callable[[AbstractDataContext], gx.Checkpoint],
@@ -173,6 +174,7 @@ class TestValidateCheckpointOperator:
         pushed_result = mock_ti.xcom_push.call_args[1]["value"]
         assert pushed_result["success"] is True
 
+    @pytest.mark.postgres
     def test_postgres_data_source(
         self,
         table_name: str,
@@ -232,6 +234,7 @@ class TestValidateCheckpointOperator:
         pushed_result = mock_ti.xcom_push.call_args[1]["value"]
         assert pushed_result["success"] is True
 
+    @pytest.mark.integration
     def test_filesystem_data_source(
         self,
         load_csv_data: Callable[[Path, list[dict]], None],
@@ -298,6 +301,7 @@ class TestValidateCheckpointOperator:
         pushed_result = mock_ti.xcom_push.call_args[1]["value"]
         assert pushed_result["success"] is True
 
+    @pytest.mark.integration
     def test_validation_failure_raises_exception(self) -> None:
         """Test that validation failure raises GXValidationFailed exception."""
         # Create data that will fail validation
@@ -348,6 +352,7 @@ class TestValidateCheckpointOperator:
         with pytest.raises(GXValidationFailed):
             validate_checkpoint.execute(context={"ti": mock_ti})
 
+    @pytest.mark.integration
     def test_validation_failure_xcom_contains_result(self) -> None:
         """Test that when validation fails and exception is raised, xcom still contains the failed result."""
         # Create data that will fail validation
