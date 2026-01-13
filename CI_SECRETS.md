@@ -27,7 +27,7 @@ Both IDs are visible in the GX Cloud UI, URLs, or existing GitHub variables.
 
 ## Creating/Rotating Credentials
 
-1. Get invited to the **GX-Airflow-Tests** organization by an existing member with admin access.
+1. Get invited to the test organization by an existing member with admin access.
 2. Log in to [GX Cloud](https://app.greatexpectations.io/) and navigate to **Tokens**.
 3. On the Tokens page you can find all required values: organization ID, workspace ID, and create user or organization access tokens.
 4. Update the GitHub variables and secrets accordingly.
