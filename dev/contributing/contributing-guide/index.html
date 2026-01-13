@@ -1017,10 +1017,11 @@
 </span></code></pre></div></p>
 <p>To run integration tests locally, set the required environment variables:
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">GX_CLOUD_ORGANIZATION_ID</span><span class="o">=</span><span class="s2">&quot;your-org-id&quot;</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">GX_CLOUD_ACCESS_TOKEN</span><span class="o">=</span><span class="s2">&quot;your-access-token&quot;</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>pytest<span class="w"> </span>-m<span class="w"> </span>integration<span class="w"> </span>tests/integration
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">GX_CLOUD_WORKSPACE_ID</span><span class="o">=</span><span class="s2">&quot;your-workspace-id&quot;</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">GX_CLOUD_ACCESS_TOKEN</span><span class="o">=</span><span class="s2">&quot;your-access-token&quot;</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>pytest<span class="w"> </span>-m<span class="w"> </span>integration<span class="w"> </span>tests/integration
 </span></code></pre></div></p>
-<p>For maintainers setting up CI, see <a href="https://github.com/astronomer/airflow-provider-great-expectations/blob/main/CI_SECRETS.md">CI_SECRETS.md</a> for credentials configuration.</p>
+<p>For details on the test organization used in CI (and how to get access), see <a href="https://github.com/astronomer/airflow-provider-great-expectations/blob/main/CI_SECRETS.md">CI_SECRETS.md</a>.</p>
 <h2 id="write-docs">Write docs</h2>
 <p>We use Markdown to author Great Expectations Airflow Provider documentation. We use hatch to build and release the docs.</p>
 <ol>
