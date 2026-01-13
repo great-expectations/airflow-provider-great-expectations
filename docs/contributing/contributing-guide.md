@@ -83,7 +83,7 @@ Test with `pytest`:
 Tests are organized into two categories:
 
 - **Unit tests** (`tests/unit/`): Run without external dependencies and don't require credentials.
-- **Integration tests** (`tests/integration/`): Require GX Cloud credentials and optionally a running Postgres or Spark instance.
+- **Integration tests** (`tests/integration/`): Require GX Cloud credentials and optionally external backends (e.g., Postgres, Spark).
 
 To run only unit tests:
 ```bash
