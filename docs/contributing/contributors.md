@@ -11,4 +11,4 @@ Learn more about the project [contributors roles](./contributor-roles.md).
 
 ## Contributors
 
-Find more contributors [in our GitHub page](https://github.com/astronomer/airflow-provider-great-expectations/graphs/contributors).
+Find more contributors [in our GitHub page](https://github.com/great-expectations/airflow-provider-great-expectations/graphs/contributors).

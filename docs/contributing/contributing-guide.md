@@ -17,7 +17,7 @@ This document describes how to contribute to the Great Expectations Airflow Prov
 
 To contribute to the Great Expectations Airflow Provider project:
 
-1. Create a [GitHub Issue](https://github.com/astronomer/airflow-provider-great-expectations/issues) describing a bug, enhancement, or feature request.
+1. Create a [GitHub Issue](https://github.com/great-expectations/airflow-provider-great-expectations/issues) describing a bug, enhancement, or feature request.
 2. Fork the repository.
 3. In your fork, open a branch off of the `main` branch.
 4. Create a Pull Request into the `main` branch of the Provider repo from your forked feature branch.
@@ -38,7 +38,7 @@ Setting up a local development environment involves fulfilling requirements, get
 
 ### Get a copy of the repository
 
-1. Fork the [Provider repository](https://github.com/astronomer/airflow-provider-great-expectations).
+1. Fork the [Provider repository](https://github.com/great-expectations/airflow-provider-great-expectations).
 
 2. Clone your fork.
    ```bash
@@ -98,7 +98,7 @@ export GX_CLOUD_ACCESS_TOKEN="your-access-token"
 pytest -m integration tests/integration
 ```
 
-For details on the test organization used in CI (and how to get access), see [CI_SECRETS.md](https://github.com/astronomer/airflow-provider-great-expectations/blob/main/CI_SECRETS.md).
+For details on the test organization used in CI (and how to get access), see [CI_SECRETS.md](https://github.com/great-expectations/airflow-provider-great-expectations/blob/main/CI_SECRETS.md).
 
 ### Running postgres tests
 
@@ -129,7 +129,7 @@ pytest -m spark_connect_integration tests/integration
 
 We use Markdown to author Great Expectations Airflow Provider documentation. We use hatch to build and release the docs.
 
-1. Update Markdown files in the [`docs/` folder](https://github.com/astronomer/airflow-provider-great-expectations/tree/docs/docs).
+1. Update Markdown files in the [`docs/` folder](https://github.com/great-expectations/airflow-provider-great-expectations/tree/docs/docs).
 2. Build and serve the documentation locally to preview your changes.
    ```bash
    hatch run docs:dev

@@ -6,7 +6,7 @@ on:
   pull_request: # Also run on pull requests originated from forks
     branches: [main]
   release:
-    types: [ 'created' ]
+    types: ["created"]
 
 # This allows a subsequently queued workflow run to interrupt and cancel previous runs
 concurrency:
@@ -70,21 +70,21 @@ jobs:
       name: pypi
       url: https://pypi.org/p/airflow-provider-great-expectations/
     permissions:
-      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
       contents: read
     steps:
-    - uses: actions/checkout@v4
-      with:
-        persist-credentials: false
-    - uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
-        architecture: "x64"
-    - name: Install uv
-      uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
-      with:
-        version: "0.7.13"
-    - name: Verify Git Tag and package version
-      run: python3 .github/scripts/verify_tag_and_version.py
-    - run: uv build --wheel --sdist
-    - run: uv publish
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          architecture: "x64"
+      - name: Install uv
+        uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
+        with:
+          version: "0.7.13"
+      - name: Verify Git Tag and package version
+        run: python3 .github/scripts/verify_tag_and_version.py
+      - run: uv build --wheel --sdist
+      - run: uv publish
