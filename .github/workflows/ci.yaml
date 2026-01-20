@@ -26,13 +26,13 @@ jobs:
 
   Deploy-Pages:
     needs: Authorize
+    if: github.event_name == 'push' || github.event_name == 'release'
     permissions:
       contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.ref }}
           persist-credentials: true
 
       - uses: actions/setup-python@v5
@@ -50,10 +50,10 @@ jobs:
 
       - name: Deploy Docs
         run: |
-          git config user.name "oss-integrations-bot"
-          git config user.email "oss-integrations-bot@astronomer.io"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git fetch origin gh-pages --depth=1
+          git fetch origin gh-pages --depth=1 || true
 
           if [[ $GITHUB_EVENT_NAME == "release" ]]; then
               hatch run docs:gh-release

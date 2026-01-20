@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "An Apache Airflow provider for Great Expectations"
 readme = "README.md"
 authors = [
-  {name = "Great Expectations & Astronomer", email = "humans@astronomer.io"}
+  {name = "Great Expectations", email = "team@greatexpectations.io"}
 ]
 license = "Apache-2.0"
 license-files = { paths = ["LICENSE"] }
@@ -64,10 +64,10 @@ tests = [
 provider_info = "great_expectations_provider.get_provider_info:get_provider_info"
 
 [project.urls]
-Homepage = "https://github.com/astronomer/airflow-provider-great-expectations"
-Documentation = "https://astronomer.github.io/airflow-provider-great-expectations/latest"
-"Source Code" = "https://github.com/astronomer/airflow-provider-great-expectations"
-"Changelog" = "https://github.com/astronomer/airflow-provider-great-expectations/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/great-expectations/airflow-provider-great-expectations"
+Documentation = "https://great-expectations.github.io/airflow-provider-great-expectations/latest"
+"Source Code" = "https://github.com/great-expectations/airflow-provider-great-expectations"
+"Changelog" = "https://github.com/great-expectations/airflow-provider-great-expectations/blob/main/CHANGELOG.md"
 
 [tool.hatch.version]
 path = "great_expectations_provider/__init__.py"

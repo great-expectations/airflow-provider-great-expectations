@@ -1,9 +1,9 @@
 site_name: Great Expectations Airflow Provider
-site_url: https://astronomer.github.io/airflow-provider-great-expectations
-copyright: © Copyright 2025, Astronomer.
+site_url: https://great-expectations.github.io/airflow-provider-great-expectations
+copyright: © Copyright 2025, Great Expectations.
 
-repo_url: https://github.com/astronomer/airflow-provider-great-expectations
-repo_name: astronomer/airflow-provider-great-expectations
+repo_url: https://github.com/great-expectations/airflow-provider-great-expectations
+repo_name: great-expectations/airflow-provider-great-expectations
 
 edit_uri: "blob/main/docs"
 
