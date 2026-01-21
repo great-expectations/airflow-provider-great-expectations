@@ -35,23 +35,23 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-athena = ["great-expectations[athena]"]
-azure = ["great-expectations[azure]"]
-bigquery = ["great-expectations[bigquery]"]
+athena = ["great-expectations[athena]>=1.7.0, <2"]
+azure = ["great-expectations[azure]>=1.7.0, <2"]
+bigquery = ["great-expectations[bigquery]>=1.7.0, <2"]
 lint = [
     "mypy==1.14.1",
     "ruff==0.8.3",
     "pytest==8.3.4",
     "pytest-mock==3.14.0",
-    "great-expectations[spark, spark-connect]"
+    "great-expectations[spark, spark-connect]>=1.7.0, <2"
 ]
-gcp = ["great-expectations[gcp]"]
-mssql = ["great-expectations[mssql]"]
-postgresql = ["great-expectations[postgresql]"]
-s3 = ["great-expectations[s3]"]
-snowflake = ["great-expectations[snowflake]"]
+gcp = ["great-expectations[gcp]>=1.7.0, <2"]
+mssql = ["great-expectations[mssql]>=1.7.0, <2"]
+postgresql = ["great-expectations[postgresql]>=1.7.0, <2"]
+s3 = ["great-expectations[s3]>=1.7.0, <2"]
+snowflake = ["great-expectations[snowflake]>=1.7.0, <2"]
 spark = [
-    "great-expectations[spark, spark-connect]",
+    "great-expectations[spark, spark-connect]>=1.7.0, <2",
     "pyarrow>=4.0.0",
     "setuptools",  # pyspark needs distutils, removed in Python 3.12
 ]
