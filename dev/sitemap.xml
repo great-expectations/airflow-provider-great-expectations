@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://astronomer.github.io/airflow-provider-great-expectations/dev/</loc>
+         <loc>https://great-expectations.github.io/airflow-provider-great-expectations/dev/</loc>
          <lastmod>2026-01-21</lastmod>
     </url>
     <url>
-         <loc>https://astronomer.github.io/airflow-provider-great-expectations/dev/examples/</loc>
+         <loc>https://great-expectations.github.io/airflow-provider-great-expectations/dev/examples/</loc>
          <lastmod>2026-01-21</lastmod>
     </url>
     <url>
-         <loc>https://astronomer.github.io/airflow-provider-great-expectations/dev/getting-started/</loc>
+         <loc>https://great-expectations.github.io/airflow-provider-great-expectations/dev/getting-started/</loc>
          <lastmod>2026-01-21</lastmod>
     </url>
     <url>
-         <loc>https://astronomer.github.io/airflow-provider-great-expectations/dev/migration-guide/</loc>
+         <loc>https://great-expectations.github.io/airflow-provider-great-expectations/dev/migration-guide/</loc>
          <lastmod>2026-01-21</lastmod>
     </url>
     <url>
-         <loc>https://astronomer.github.io/airflow-provider-great-expectations/dev/contributing/code-of-conduct/</loc>
+         <loc>https://great-expectations.github.io/airflow-provider-great-expectations/dev/contributing/code-of-conduct/</loc>
          <lastmod>2026-01-21</lastmod>
     </url>
     <url>
-         <loc>https://astronomer.github.io/airflow-provider-great-expectations/dev/contributing/contributing-guide/</loc>
+         <loc>https://great-expectations.github.io/airflow-provider-great-expectations/dev/contributing/contributing-guide/</loc>
          <lastmod>2026-01-21</lastmod>
     </url>
     <url>
-         <loc>https://astronomer.github.io/airflow-provider-great-expectations/dev/contributing/contributor-roles/</loc>
+         <loc>https://great-expectations.github.io/airflow-provider-great-expectations/dev/contributing/contributor-roles/</loc>
          <lastmod>2026-01-21</lastmod>
     </url>
     <url>
-         <loc>https://astronomer.github.io/airflow-provider-great-expectations/dev/contributing/contributors/</loc>
+         <loc>https://great-expectations.github.io/airflow-provider-great-expectations/dev/contributing/contributors/</loc>
          <lastmod>2026-01-21</lastmod>
     </url>
 </urlset>
