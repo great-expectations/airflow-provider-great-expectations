@@ -13,7 +13,7 @@ def deploy_docs(deploy_type: str):
 
     if deploy_type == "release":
         # TODO: Re-enable this if else block when we are out of pre-release and mark a stable release 1.0.0
-        # Tracking ticket: https://github.com/astronomer/airflow-provider-great-expectations/issues/187
+        # Tracking ticket: https://github.com/great-expectations/airflow-provider-great-expectations/issues/187
         # if _version.pre is not None:
         #     command = ["mike", "deploy", "--push", "dev"]
         # else:

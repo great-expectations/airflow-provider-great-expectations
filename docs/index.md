@@ -16,15 +16,15 @@ If you used the legacy `GreatExpectationsOperator`, follow the [migration guide]
 
 ## Getting help
 
-Report bugs, questions, and feature requests in our [ticket tracker](https://github.com/astronomer/airflow-provider-great-expectations/issues).
+Report bugs, questions, and feature requests in our [ticket tracker](https://github.com/great-expectations/airflow-provider-great-expectations/issues).
 
 ## Contributing
 
 The Great Expectations Airflow Provider is an open-source project. Learn about its development process and about how you can contribute:
 
 - [Contributing guide](contributing/contributing-guide.md)
-- [GitHub repository](https://github.com/astronomer/airflow-provider-great-expectations)
+- [GitHub repository](https://github.com/great-expectations/airflow-provider-great-expectations)
 
 ## License
 
-To learn more about the terms and conditions for use, reproduction, and distribution, read the [Apache License 2.0](https://github.com/astronomer/airflow-provider-great-expectations/blob/main/LICENSE.txt).
+To learn more about the terms and conditions for use, reproduction, and distribution, read the [Apache License 2.0](https://github.com/great-expectations/airflow-provider-great-expectations/blob/main/LICENSE.txt).
