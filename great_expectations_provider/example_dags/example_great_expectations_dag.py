@@ -58,7 +58,8 @@ def configure_checkpoint(context: AbstractDataContext) -> Checkpoint:
     """This function takes a GX Context and returns a Checkpoint that
     can load our CSV files from the data directory, validate them
     against an ExpectationSuite, and run Actions."""
-    # import gx locally to avoid loading every time the dag is reloaded
+    # import gx objects locally to avoid the cost of importing GX each time the DAG is reloaded
+
     import great_expectations.expectations as gxe
     from great_expectations import Checkpoint, ExpectationSuite, ValidationDefinition
 
@@ -115,6 +116,8 @@ batch_parameters = {"year": "2019", "month": SUCCESS_MONTH}
 
 
 def configure_expectations_suite(context: AbstractDataContext) -> ExpectationSuite:
+    # import gx objects locally to avoid the cost of importing GX each time the DAG is reloaded
+
     import great_expectations.expectations as gxe
     from great_expectations import ExpectationSuite
 

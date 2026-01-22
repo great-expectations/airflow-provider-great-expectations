@@ -3,7 +3,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import great_expectations.expectations as gxe
 from airflow import DAG
 
 try:  # airflow 3
@@ -15,7 +14,6 @@ except ImportError:  # airflow 2
         chain,
     )
 
-from great_expectations import Checkpoint, ExpectationSuite, ValidationDefinition
 
 from great_expectations_provider.operators.validate_batch import GXValidateBatchOperator
 from great_expectations_provider.operators.validate_checkpoint import (
@@ -23,6 +21,7 @@ from great_expectations_provider.operators.validate_checkpoint import (
 )
 
 if TYPE_CHECKING:
+    from great_expectations import Checkpoint, ExpectationSuite
     from great_expectations.core.batch_definition import BatchDefinition
     from great_expectations.data_context import AbstractDataContext
 
@@ -51,6 +50,11 @@ def configure_checkpoint(context: AbstractDataContext) -> Checkpoint:
     """This function takes a GX Context and returns a Checkpoint that
     can load our CSV files from the data directory, validate them
     against an ExpectationSuite, and run Actions."""
+    # import gx objects locally to avoid the cost of importing GX each time the DAG is reloaded
+
+    import great_expectations.expectations as gxe
+    from great_expectations import Checkpoint, ExpectationSuite, ValidationDefinition
+
     # setup data source, asset, batch definition
     batch_definition = (
         context.data_sources.add_pandas_filesystem(
@@ -98,6 +102,11 @@ def configure_checkpoint(context: AbstractDataContext) -> Checkpoint:
 
 
 def configure_expectations_suite(context: AbstractDataContext) -> ExpectationSuite:
+    # import gx objects locally to avoid the cost of importing GX each time the DAG is reloaded
+
+    import great_expectations.expectations as gxe
+    from great_expectations import ExpectationSuite
+
     return context.suites.add(
         ExpectationSuite(
             name="Taxi Data Expectations",
