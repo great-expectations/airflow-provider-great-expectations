@@ -96,7 +96,7 @@ class TestGXValidateDataFrameOperator:
         def configure_expectations_suite(
             context: AbstractDataContext,
         ) -> ExpectationSuite:
-            return context.suites.add(
+            return context.suites.add_or_update(
                 ExpectationSuite(
                     name=task_id,
                     expectations=[

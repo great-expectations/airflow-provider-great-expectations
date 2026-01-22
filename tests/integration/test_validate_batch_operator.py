@@ -94,7 +94,7 @@ class TestValidateBatchOperator:
         def configure_expectations_suite(
             context: AbstractDataContext,
         ) -> gx.ExpectationSuite:
-            return context.suites.add(
+            return context.suites.add_or_update(
                 gx.ExpectationSuite(
                     name=rand_name(),
                     expectations=[

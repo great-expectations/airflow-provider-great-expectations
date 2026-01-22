@@ -121,7 +121,7 @@ def configure_expectations_suite(context: AbstractDataContext) -> ExpectationSui
     import great_expectations.expectations as gxe
     from great_expectations import ExpectationSuite
 
-    return context.suites.add(
+    return context.suites.add_or_update(
         ExpectationSuite(
             name="Taxi Data Expectations",
             expectations=[
