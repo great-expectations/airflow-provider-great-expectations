@@ -16,6 +16,7 @@ from tests.integration.conftest import is_valid_gx_cloud_url, rand_name
 
 if TYPE_CHECKING:
     from airflow.utils.context import Context
+    from great_expectations.data_context import AbstractDataContext
     from pyspark.sql import SparkSession
     from pyspark.sql.connect.session import SparkSession as SparkConnectSession
 
@@ -35,24 +36,30 @@ class TestGXValidateDataFrameOperator:
         def configure_dataframe() -> pd.DataFrame:
             return pd.DataFrame({column_name: ["a", "b", "c"]})
 
-        expect = ExpectationSuite(
-            name=task_id,
-            expectations=[
-                ExpectColumnValuesToBeInSet(
-                    column=column_name,
-                    value_set=["a", "b", "c", "d", "e"],  # type: ignore[arg-type]
-                ),
-            ],
-        )
         ensure_data_source_cleanup(task_id)
         ensure_suite_cleanup(task_id)
         ensure_validation_definition_cleanup(task_id)
+
+        def configure_expectations_suite(
+            context: AbstractDataContext,
+        ) -> ExpectationSuite:
+            return context.suites.add(
+                ExpectationSuite(
+                    name=task_id,
+                    expectations=[
+                        ExpectColumnValuesToBeInSet(
+                            column=column_name,
+                            value_set=["a", "b", "c", "d", "e"],  # type: ignore[arg-type]
+                        ),
+                    ],
+                )
+            )
 
         validate_df = GXValidateDataFrameOperator(
             context_type="cloud",
             task_id=task_id,
             configure_dataframe=configure_dataframe,
-            expect=expect,
+            configure_expectations=configure_expectations_suite,
         )
         mock_ti = Mock()
 
@@ -82,24 +89,30 @@ class TestGXValidateDataFrameOperator:
         def configure_dataframe() -> pd.DataFrame:
             return pd.DataFrame({column_name: ["a", "b", "c"]})
 
-        expect = ExpectationSuite(
-            name=task_id,
-            expectations=[
-                ExpectColumnValuesToBeInSet(
-                    column=column_name,
-                    value_set=["a", "b", "c", "d", "e"],  # type: ignore[arg-type]
-                ),
-            ],
-        )
         ensure_data_source_cleanup(task_id)
         ensure_suite_cleanup(task_id)
         ensure_validation_definition_cleanup(task_id)
+
+        def configure_expectations_suite(
+            context: AbstractDataContext,
+        ) -> ExpectationSuite:
+            return context.suites.add(
+                ExpectationSuite(
+                    name=task_id,
+                    expectations=[
+                        ExpectColumnValuesToBeInSet(
+                            column=column_name,
+                            value_set=["a", "b", "c", "d", "e"],  # type: ignore[arg-type]
+                        ),
+                    ],
+                )
+            )
 
         validate_df = GXValidateDataFrameOperator(
             context_type="cloud",
             task_id=task_id,
             configure_dataframe=configure_dataframe,
-            expect=expect,
+            configure_expectations=configure_expectations_suite,
         )
         mock_ti_a = Mock()
         context_a: Context = {"ti": mock_ti_a}  # type: ignore[typeddict-item]
@@ -130,13 +143,18 @@ class TestGXValidateDataFrameOperator:
             assert isinstance(data_frame, pyspark.DataFrame)
             return data_frame
 
+        def configure_expectations(
+            context: AbstractDataContext,
+        ) -> ExpectColumnValuesToBeInSet:
+            return ExpectColumnValuesToBeInSet(
+                column=column_name,
+                value_set=["a", "b", "c", "d", "e"],
+            )
+
         validate_df = GXValidateDataFrameOperator(
             task_id=task_id,
             configure_dataframe=configure_dataframe,
-            expect=ExpectColumnValuesToBeInSet(
-                column=column_name,
-                value_set=["a", "b", "c", "d", "e"],
-            ),
+            configure_expectations=configure_expectations,
         )
         mock_ti = Mock()
 
@@ -162,13 +180,18 @@ class TestGXValidateDataFrameOperator:
             assert isinstance(data_frame, SparkConnectDataFrame)
             return data_frame
 
+        def configure_expectations(
+            context: AbstractDataContext,
+        ) -> ExpectColumnValuesToBeInSet:
+            return ExpectColumnValuesToBeInSet(
+                column=column_name,
+                value_set=["a", "b", "c", "d", "e"],
+            )
+
         validate_df = GXValidateDataFrameOperator(
             task_id=task_id,
             configure_dataframe=configure_dataframe,
-            expect=ExpectColumnValuesToBeInSet(
-                column=column_name,
-                value_set=["a", "b", "c", "d", "e"],
-            ),
+            configure_expectations=configure_expectations,
         )
         mock_ti = Mock()
 
@@ -192,15 +215,18 @@ class TestGXValidateDataFrameOperator:
                 {column_name: ["x", "y", "z"]}
             )  # values NOT in expected set
 
-        expect = ExpectColumnValuesToBeInSet(
-            column=column_name,
-            value_set=["a", "b", "c"],  # different values to cause failure
-        )
+        def configure_expectations(
+            context: AbstractDataContext,
+        ) -> ExpectColumnValuesToBeInSet:
+            return ExpectColumnValuesToBeInSet(
+                column=column_name,
+                value_set=["a", "b", "c"],  # different values to cause failure
+            )
 
         validate_df = GXValidateDataFrameOperator(
             task_id=task_id,
             configure_dataframe=configure_dataframe,
-            expect=expect,
+            configure_expectations=configure_expectations,
             context_type="ephemeral",
         )
 
@@ -221,15 +247,18 @@ class TestGXValidateDataFrameOperator:
                 {column_name: ["x", "y", "z"]}
             )  # values NOT in expected set
 
-        expect = ExpectColumnValuesToBeInSet(
-            column=column_name,
-            value_set=["a", "b", "c"],  # different values to cause failure
-        )
+        def configure_expectations(
+            context: AbstractDataContext,
+        ) -> ExpectColumnValuesToBeInSet:
+            return ExpectColumnValuesToBeInSet(
+                column=column_name,
+                value_set=["a", "b", "c"],  # different values to cause failure
+            )
 
         validate_df = GXValidateDataFrameOperator(
             task_id=task_id,
             configure_dataframe=configure_dataframe,
-            expect=expect,
+            configure_expectations=configure_expectations,
             context_type="ephemeral",
         )
         mock_ti = Mock()

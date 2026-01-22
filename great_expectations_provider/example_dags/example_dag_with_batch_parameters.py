@@ -97,20 +97,22 @@ def configure_checkpoint(context: AbstractDataContext) -> Checkpoint:
     return checkpoint
 
 
-# define a consistent set of expectations we'll use throughout the pipeline
-expectation_suite = ExpectationSuite(
-    name="Taxi Data Expectations",
-    expectations=[
-        gxe.ExpectTableRowCountToBeBetween(
-            min_value=9000,
-            max_value=11000,
-        ),
-        gxe.ExpectColumnValuesToNotBeNull(column="vendor_id"),
-        gxe.ExpectColumnValuesToBeBetween(
-            column="passenger_count", min_value=1, max_value=6
-        ),
-    ],
-)
+def configure_expectations_suite(context: AbstractDataContext) -> ExpectationSuite:
+    return context.suites.add(
+        ExpectationSuite(
+            name="Taxi Data Expectations",
+            expectations=[
+                gxe.ExpectTableRowCountToBeBetween(
+                    min_value=9000,
+                    max_value=11000,
+                ),
+                gxe.ExpectColumnValuesToNotBeNull(column="vendor_id"),
+                gxe.ExpectColumnValuesToBeBetween(
+                    column="passenger_count", min_value=1, max_value=6
+                ),
+            ],
+        )
+    )
 
 
 # Batch Parameters are available as DAG params, to be consumed directly by the
@@ -131,7 +133,7 @@ with DAG(
     validate_extract = GXValidateBatchOperator(
         task_id="validate_extract",
         configure_batch_definition=configure_pandas_batch_definition,
-        expect=expectation_suite,
+        configure_expectations=configure_expectations_suite,
     )
 
     validate_load = GXValidateCheckpointOperator(

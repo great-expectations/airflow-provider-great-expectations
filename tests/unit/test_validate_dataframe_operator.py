@@ -1,4 +1,5 @@
 import json
+import warnings
 from typing import TYPE_CHECKING, Literal
 from unittest.mock import Mock, create_autospec
 
@@ -6,7 +7,7 @@ import pandas as pd
 import pytest
 from great_expectations import ExpectationSuite
 from great_expectations.core import ExpectationValidationResult
-from great_expectations.data_context import EphemeralDataContext
+from great_expectations.data_context import AbstractDataContext, EphemeralDataContext
 from great_expectations.datasource.fluent import PandasDatasource, SparkDatasource
 from great_expectations.datasource.fluent.pandas_datasource import (
     DataFrameAsset as PandasDataFrameAsset,
@@ -49,10 +50,15 @@ class TestValidateDataFrameOperator:
             value_set=["a", "b", "c", "d", "e"],  # type: ignore[arg-type]
         )
 
+        def configure_expectations(
+            context: AbstractDataContext,
+        ) -> ExpectColumnValuesToBeInSet:
+            return expect
+
         validate_df = GXValidateDataFrameOperator(
             task_id="validate_df_success",
             configure_dataframe=configure_dataframe,
-            expect=expect,
+            configure_expectations=configure_expectations,
         )
         mock_ti = Mock()
         context: Context = {"ti": mock_ti}  # type: ignore[typeddict-item]
@@ -74,20 +80,25 @@ class TestValidateDataFrameOperator:
         def configure_dataframe() -> pd.DataFrame:
             return pd.DataFrame({column_name: ["a", "b", "c"]})
 
-        expect = ExpectationSuite(
-            name="test suite",
-            expectations=[
-                ExpectColumnValuesToBeInSet(
-                    column=column_name,
-                    value_set=["a", "b", "c", "d", "e"],  # type: ignore[arg-type]
-                ),
-            ],
-        )
+        def configure_expectations_suite(
+            context: AbstractDataContext,
+        ) -> ExpectationSuite:
+            return context.suites.add(
+                ExpectationSuite(
+                    name="test suite",
+                    expectations=[
+                        ExpectColumnValuesToBeInSet(
+                            column=column_name,
+                            value_set=["a", "b", "c", "d", "e"],  # type: ignore[arg-type]
+                        ),
+                    ],
+                )
+            )
 
         validate_df = GXValidateDataFrameOperator(
             task_id="validate_df_success",
             configure_dataframe=configure_dataframe,
-            expect=expect,
+            configure_expectations=configure_expectations_suite,
         )
         mock_ti = Mock()
         context: Context = {"ti": mock_ti}  # type: ignore[typeddict-item]
@@ -172,10 +183,15 @@ class TestValidateDataFrameOperator:
             value_set=["a", "b", "c", "d", "e"],  # type: ignore[arg-type]
         )
 
+        def configure_expectations(
+            context: AbstractDataContext,
+        ) -> ExpectColumnValuesToBeInSet:
+            return expect
+
         validate_df = GXValidateDataFrameOperator(
             task_id="test-result-format",
             configure_dataframe=configure_dataframe,
-            expect=expect,
+            configure_expectations=configure_expectations,
             result_format=result_format,
         )
         mock_ti = Mock()
@@ -195,10 +211,13 @@ class TestValidateDataFrameOperator:
         # arrange
         context_type: Literal["ephemeral"] = "ephemeral"
 
+        def configure_expectations(context: AbstractDataContext) -> Mock:
+            return Mock()
+
         validate_df = GXValidateDataFrameOperator(
             task_id="validate_df_success",
             configure_dataframe=Mock(return_value=Mock(spec=pd.DataFrame)),
-            expect=Mock(),
+            configure_expectations=configure_expectations,
             context_type=context_type,
         )
         mock_ti = Mock()
@@ -218,10 +237,13 @@ class TestValidateDataFrameOperator:
         # arrange
         context_type: Literal["cloud"] = "cloud"
 
+        def configure_expectations(context: AbstractDataContext) -> Mock:
+            return Mock()
+
         validate_df = GXValidateDataFrameOperator(
             task_id="validate_df_success",
             configure_dataframe=Mock(return_value=Mock(spec=pd.DataFrame)),
-            expect=Mock(),
+            configure_expectations=configure_expectations,
             context_type=context_type,
         )
         mock_ti = Mock()
@@ -239,10 +261,13 @@ class TestValidateDataFrameOperator:
     def test_pandas_does_not_error_when_no_datasource(
         self, mock_gx_no_datasource: Mock
     ) -> None:
+        def configure_expectations(context: AbstractDataContext) -> Mock:
+            return Mock()
+
         validate_df = GXValidateDataFrameOperator(
             task_id="validate_df_success",
             configure_dataframe=Mock(return_value=Mock(spec=pd.DataFrame)),
-            expect=Mock(),
+            configure_expectations=configure_expectations,
             context_type="cloud",
         )
         mock_ti = Mock()
@@ -254,10 +279,13 @@ class TestValidateDataFrameOperator:
     def test_pandas_does_not_error_when_no_asset(
         self, mock_gx_with_pandas_datasource_but_no_asset: Mock
     ) -> None:
+        def configure_expectations(context: AbstractDataContext) -> Mock:
+            return Mock()
+
         validate_df = GXValidateDataFrameOperator(
             task_id="validate_df_success",
             configure_dataframe=Mock(return_value=Mock(spec=pd.DataFrame)),
-            expect=Mock(),
+            configure_expectations=configure_expectations,
             context_type="cloud",
         )
         mock_ti = Mock()
@@ -269,10 +297,13 @@ class TestValidateDataFrameOperator:
     def test_pandas_does_not_error_when_no_batch_definition(
         self, mock_gx_with_pandas_datasource_but_no_batch_definition: Mock
     ) -> None:
+        def configure_expectations(context: AbstractDataContext) -> Mock:
+            return Mock()
+
         validate_df = GXValidateDataFrameOperator(
             task_id="validate_df_success",
             configure_dataframe=Mock(return_value=Mock(spec=pd.DataFrame)),
-            expect=Mock(),
+            configure_expectations=configure_expectations,
             context_type="cloud",
         )
         mock_ti = Mock()
@@ -284,10 +315,13 @@ class TestValidateDataFrameOperator:
     def test_spark_does_not_error_when_no_datasource(
         self, mock_gx_no_datasource: Mock
     ) -> None:
+        def configure_expectations(context: AbstractDataContext) -> Mock:
+            return Mock()
+
         validate_df = GXValidateDataFrameOperator(
             task_id="validate_df_success",
             configure_dataframe=Mock(return_value=Mock(spec=pd.DataFrame)),
-            expect=Mock(),
+            configure_expectations=configure_expectations,
             context_type="cloud",
         )
         mock_ti = Mock()
@@ -299,10 +333,13 @@ class TestValidateDataFrameOperator:
     def test_spark_does_not_error_when_no_asset(
         self, mock_gx_with_spark_datasource_but_no_asset: Mock
     ) -> None:
+        def configure_expectations(context: AbstractDataContext) -> Mock:
+            return Mock()
+
         validate_df = GXValidateDataFrameOperator(
             task_id="validate_df_success",
             configure_dataframe=Mock(return_value=MockSparkDataFrame()),
-            expect=Mock(),
+            configure_expectations=configure_expectations,
             context_type="cloud",
         )
         mock_ti = Mock()
@@ -314,10 +351,13 @@ class TestValidateDataFrameOperator:
     def test_spark_does_not_error_when_no_batch_definition(
         self, mock_gx_with_spark_datasource_but_no_batch_definition: Mock
     ) -> None:
+        def configure_expectations(context: AbstractDataContext) -> Mock:
+            return Mock()
+
         validate_df = GXValidateDataFrameOperator(
             task_id="validate_df_success",
             configure_dataframe=Mock(return_value=MockSparkDataFrame()),
-            expect=Mock(),
+            configure_expectations=configure_expectations,
             context_type="cloud",
         )
         mock_ti = Mock()
@@ -342,10 +382,15 @@ class TestValidateDataFrameOperator:
             value_set=["a", "b", "c"],  # different values to cause failure
         )
 
+        def configure_expectations(
+            context: AbstractDataContext,
+        ) -> ExpectColumnValuesToBeInSet:
+            return expect
+
         validate_df = GXValidateDataFrameOperator(
             task_id="validate_df_failure",
             configure_dataframe=configure_dataframe,
-            expect=expect,
+            configure_expectations=configure_expectations,
         )
         mock_ti = Mock()
         context: Context = {"ti": mock_ti}  # type: ignore[typeddict-item]
@@ -370,10 +415,15 @@ class TestValidateDataFrameOperator:
             value_set=["a", "b", "c"],  # different values to cause failure
         )
 
+        def configure_expectations(
+            context: AbstractDataContext,
+        ) -> ExpectColumnValuesToBeInSet:
+            return expect
+
         validate_df = GXValidateDataFrameOperator(
             task_id="validate_df_failure",
             configure_dataframe=configure_dataframe,
-            expect=expect,
+            configure_expectations=configure_expectations,
         )
         mock_ti = Mock()
         context: Context = {"ti": mock_ti}  # type: ignore[typeddict-item]
@@ -388,6 +438,84 @@ class TestValidateDataFrameOperator:
         assert call_args[1]["key"] == "return_value"
         result = call_args[1]["value"]
         assert result["success"] is False
+
+    def test_deprecated_expect_parameter_raises_warning(self) -> None:
+        """Expect that using deprecated 'expect' parameter raises DeprecationWarning but still works."""
+        # arrange
+        column_name = "col_A"
+
+        def configure_dataframe() -> pd.DataFrame:
+            return pd.DataFrame({column_name: ["a", "b", "c"]})
+
+        expect = ExpectColumnValuesToBeInSet(
+            column=column_name,
+            value_set=["a", "b", "c", "d", "e"],  # type: ignore[arg-type]
+        )
+
+        # act & assert
+        with pytest.warns(
+            DeprecationWarning, match="The 'expect' parameter is deprecated"
+        ):
+            validate_df = GXValidateDataFrameOperator(
+                task_id="validate_df_deprecated",
+                configure_dataframe=configure_dataframe,
+                expect=expect,
+            )
+
+        # Verify it still works
+        mock_ti = Mock()
+        context: Context = {"ti": mock_ti}  # type: ignore[typeddict-item]
+        validate_df.execute(context=context)
+        pushed_result = mock_ti.xcom_push.call_args[1]["value"]
+        assert pushed_result["success"] is True
+
+    def test_configure_expectations_works_without_warning(self) -> None:
+        """Expect that using new 'configure_expectations' parameter works without warning."""
+        # arrange
+        column_name = "col_A"
+
+        def configure_dataframe() -> pd.DataFrame:
+            return pd.DataFrame({column_name: ["a", "b", "c"]})
+
+        expect = ExpectColumnValuesToBeInSet(
+            column=column_name,
+            value_set=["a", "b", "c", "d", "e"],  # type: ignore[arg-type]
+        )
+
+        def configure_expectations(
+            context: AbstractDataContext,
+        ) -> ExpectColumnValuesToBeInSet:
+            return expect
+
+        # act & assert - should not raise any warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            validate_df = GXValidateDataFrameOperator(
+                task_id="validate_df_new",
+                configure_dataframe=configure_dataframe,
+                configure_expectations=configure_expectations,
+            )
+
+        # Verify it works
+        mock_ti = Mock()
+        context: Context = {"ti": mock_ti}  # type: ignore[typeddict-item]
+        validate_df.execute(context=context)
+        pushed_result = mock_ti.xcom_push.call_args[1]["value"]
+        assert pushed_result["success"] is True
+
+    def test_missing_configure_expectations_raises_value_error(self) -> None:
+        """Expect that omitting both 'configure_expectations' and deprecated 'expect' raises ValueError."""
+
+        # arrange
+        def configure_dataframe() -> pd.DataFrame:
+            return pd.DataFrame({"col": [1, 2, 3]})
+
+        # act & assert
+        with pytest.raises(ValueError, match="configure_expectations is required"):
+            GXValidateDataFrameOperator(
+                task_id="validate_df_missing",
+                configure_dataframe=configure_dataframe,
+            )
 
     @pytest.fixture
     def mock_gx_no_datasource(
