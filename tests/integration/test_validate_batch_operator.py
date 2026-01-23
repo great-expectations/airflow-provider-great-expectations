@@ -29,10 +29,6 @@ class TestValidateBatchOperator:
         ensure_suite_cleanup(task_id)
         ensure_validation_definition_cleanup(task_id)
         dataframe = pd.DataFrame({self.COL_NAME: ["a", "b", "c"]})
-        expect = gxe.ExpectColumnValuesToBeInSet(
-            column=self.COL_NAME,
-            value_set=["a", "b", "c", "d", "e"],  # type: ignore[arg-type]
-        )
         batch_parameters = {"dataframe": dataframe}
 
         def configure_batch_definition(context: AbstractDataContext) -> BatchDefinition:
@@ -42,10 +38,18 @@ class TestValidateBatchOperator:
                 .add_batch_definition_whole_dataframe(task_id)
             )
 
+        def configure_expectations(
+            context: AbstractDataContext,
+        ) -> gxe.ExpectColumnValuesToBeInSet:
+            return gxe.ExpectColumnValuesToBeInSet(
+                column=self.COL_NAME,
+                value_set=["a", "b", "c", "d", "e"],  # type: ignore[arg-type]
+            )
+
         validate_cloud_batch = GXValidateBatchOperator(
             task_id=task_id,
             configure_batch_definition=configure_batch_definition,
-            expect=expect,
+            configure_expectations=configure_expectations,
             batch_parameters=batch_parameters,
             context_type="cloud",
         )
@@ -87,22 +91,27 @@ class TestValidateBatchOperator:
                 )
             )
 
-        expect = gx.ExpectationSuite(
-            name=rand_name(),
-            expectations=[
-                gxe.ExpectColumnValuesToBeBetween(
-                    column="age",
-                    min_value=0,
-                    max_value=100,
-                ),
-                gxe.ExpectTableRowCountToEqual(value=2),
-            ],
-        )
+        def configure_expectations_suite(
+            context: AbstractDataContext,
+        ) -> gx.ExpectationSuite:
+            return context.suites.add_or_update(
+                gx.ExpectationSuite(
+                    name=rand_name(),
+                    expectations=[
+                        gxe.ExpectColumnValuesToBeBetween(
+                            column="age",
+                            min_value=0,
+                            max_value=100,
+                        ),
+                        gxe.ExpectTableRowCountToEqual(value=2),
+                    ],
+                )
+            )
 
         validate_cloud_batch = GXValidateBatchOperator(
             task_id=task_id,
             configure_batch_definition=configure_batch_definition,
-            expect=expect,
+            configure_expectations=configure_expectations_suite,
             context_type="ephemeral",
         )
 
@@ -141,17 +150,20 @@ class TestValidateBatchOperator:
                 .add_batch_definition_whole_table(task_id)
             )
 
-        expect = gxe.ExpectColumnValuesToBeBetween(
-            column="age",
-            min_value=0,
-            max_value=100,
-        )
+        def configure_expectations(
+            context: AbstractDataContext,
+        ) -> gxe.ExpectColumnValuesToBeBetween:
+            return gxe.ExpectColumnValuesToBeBetween(
+                column="age",
+                min_value=0,
+                max_value=100,
+            )
 
         validate_batch = GXValidateBatchOperator(
             context_type="ephemeral",
             task_id=task_id,
             configure_batch_definition=configure_batch_definition,
-            expect=expect,
+            configure_expectations=configure_expectations,
         )
 
         mock_ti = Mock()
@@ -169,10 +181,6 @@ class TestValidateBatchOperator:
         dataframe = pd.DataFrame(
             {self.COL_NAME: ["x", "y", "z"]}
         )  # values NOT in expected set
-        expect = gxe.ExpectColumnValuesToBeInSet(
-            column=self.COL_NAME,
-            value_set=["a", "b", "c"],  # different values to cause failure
-        )
         batch_parameters = {"dataframe": dataframe}
 
         def configure_batch_definition(context: AbstractDataContext) -> BatchDefinition:
@@ -182,10 +190,18 @@ class TestValidateBatchOperator:
                 .add_batch_definition_whole_dataframe(task_id)
             )
 
+        def configure_expectations(
+            context: AbstractDataContext,
+        ) -> gxe.ExpectColumnValuesToBeInSet:
+            return gxe.ExpectColumnValuesToBeInSet(
+                column=self.COL_NAME,
+                value_set=["a", "b", "c"],  # different values to cause failure
+            )
+
         validate_batch = GXValidateBatchOperator(
             task_id=task_id,
             configure_batch_definition=configure_batch_definition,
-            expect=expect,
+            configure_expectations=configure_expectations,
             batch_parameters=batch_parameters,
             context_type="ephemeral",
         )
@@ -202,10 +218,7 @@ class TestValidateBatchOperator:
         dataframe = pd.DataFrame(
             {self.COL_NAME: ["x", "y", "z"]}
         )  # values NOT in expected set
-        expect = gxe.ExpectColumnValuesToBeInSet(
-            column=self.COL_NAME,
-            value_set=["a", "b", "c"],  # different values to cause failure
-        )
+
         batch_parameters = {"dataframe": dataframe}
 
         def configure_batch_definition(context: AbstractDataContext) -> BatchDefinition:
@@ -215,10 +228,18 @@ class TestValidateBatchOperator:
                 .add_batch_definition_whole_dataframe(task_id)
             )
 
+        def configure_expectations(
+            context: AbstractDataContext,
+        ) -> gxe.ExpectColumnValuesToBeInSet:
+            return gxe.ExpectColumnValuesToBeInSet(
+                column=self.COL_NAME,
+                value_set=["a", "b", "c"],  # different values to cause failure
+            )
+
         validate_batch = GXValidateBatchOperator(
             task_id=task_id,
             configure_batch_definition=configure_batch_definition,
-            expect=expect,
+            configure_expectations=configure_expectations,
             batch_parameters=batch_parameters,
             context_type="ephemeral",
         )

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING, Callable, Literal, Union
 
 from airflow.models import BaseOperator
@@ -33,8 +34,9 @@ class GXValidateDataFrameOperator(BaseOperator):
     Args:
         task_id: Airflow task ID. Alphanumeric name used in the Airflow UI and to name components in GX Cloud.
         configure_dataframe: A callable which returns the DataFrame to be validated.
-        expect: An Expectation or ExpectationSuite to validate against the DataFrame. Available Expectations can
-            be found at https://greatexpectations.io/expectations.
+        configure_expectations: A callable that takes an AbstractDataContext and returns an Expectation or
+            ExpectationSuite to validate against the DataFrame. Available Expectations can be found at
+            https://greatexpectations.io/expectations.
         result_format: control the verbosity of returned Validation Results. Possible values are
             "BOOLEAN_ONLY", "BASIC", "SUMMARY", "COMPLETE". Defaults to "SUMMARY". See
             https://docs.greatexpectations.io/docs/core/trigger_actions_based_on_results/choose_a_result_format
@@ -50,7 +52,10 @@ class GXValidateDataFrameOperator(BaseOperator):
         configure_dataframe: Callable[
             [], DataFrame | pyspark.DataFrame | SparkConnectDataFrame
         ],
-        expect: Expectation | ExpectationSuite,
+        configure_expectations: Callable[
+            [AbstractDataContext], Expectation | ExpectationSuite
+        ]
+        | None = None,
         context_type: Literal["ephemeral", "cloud"] = "ephemeral",
         result_format: (
             Literal["BOOLEAN_ONLY", "BASIC", "SUMMARY", "COMPLETE"] | None
@@ -59,11 +64,26 @@ class GXValidateDataFrameOperator(BaseOperator):
         *args,
         **kwargs,
     ) -> None:
+        # Handle deprecated 'expect' parameter - store directly for serialization safety
+        # Must pop before calling super().__init__() as Airflow 3 rejects unknown kwargs
+        self._deprecated_expect: Expectation | ExpectationSuite | None = None
+        if "expect" in kwargs:
+            warnings.warn(
+                "The 'expect' parameter is deprecated. Use 'configure_expectations' instead. "
+                "Pass a callable that takes an AbstractDataContext and returns an Expectation or ExpectationSuite.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            self._deprecated_expect = kwargs.pop("expect")
+
         super().__init__(*args, **kwargs)
+
+        if configure_expectations is None and self._deprecated_expect is None:
+            raise ValueError("configure_expectations is required")
 
         self.context_type = context_type
         self.dataframe = configure_dataframe()
-        self.expect = expect
+        self.configure_expectations = configure_expectations
         self.result_format = result_format
         self.conn_id = conn_id
 
@@ -88,12 +108,19 @@ class GXValidateDataFrameOperator(BaseOperator):
                 f"Unsupported dataframe type: {type(self.dataframe).__name__}"
             )
 
+        if self.configure_expectations is not None:
+            expect = self.configure_expectations(gx_context)
+        elif self._deprecated_expect is not None:
+            expect = self._deprecated_expect
+        else:
+            raise ValueError("configure_expectations is required")
+
         batch_parameters = {
             "dataframe": self.dataframe,
         }
         result = run_validation_definition(
             task_id=self.task_id,
-            expect=self.expect,
+            expect=expect,
             batch_definition=batch_definition,
             result_format=self.result_format,
             batch_parameters=batch_parameters,
