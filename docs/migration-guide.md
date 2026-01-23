@@ -4,11 +4,11 @@ This guide will help you migrate from V0 to V1 of the Great Expectations Airflow
 
 Here is an overview of key differences between versions:
 
-| Provider version | V0 | V1 |
-|---|---|---|
-| Operators | `GreatExpectationsOperator` | `GXValidateDataFrameOperator`<br>`GXValidateBatchOperator`<br>`GXValidateCheckpointOperator` |
-| GX version | 0.18 and earlier | 1.3.11 and later |
-| Data Contexts | File | Ephemeral<br>Cloud<br>File (`GXValidateCheckpointOperator` only) |
+| Provider version | V0 | V1                                                                                                                                                    |
+|---|---|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Operators | `GreatExpectationsOperator` | `GXValidateDataFrameOperator`<br>`GXValidateBatchOperator`<br>`GXValidateCheckpointOperator`                                                          |
+| GX version | 0.18 and earlier | 1.7.0 and later                                                                                                                                       |
+| Data Contexts | File | Ephemeral<br>Cloud<br>File (`GXValidateCheckpointOperator` only)                                                                                      |
 | Response handling | By default, any Expectation failure raises an `AirflowException`. To override this behavior and continue running the pipeline even if tests fail, you can set the `fail_task_on_validation_failure` flag to `False`. | Regardless of Expectation failure or success, a Validation Result is made available to subsequent tasks, which can decide what to do with the result. |
 
 For guidance on which Operator and Data Context best fit your needs, see [Operator use cases](getting-started.md/#operator-use-cases). Note that while File Data Contexts are still supported with `GXValidateCheckpointOperator`, they require extra configuration and can be challenging to use when Airflow is running in a distributed environment. Most uses of the legacy `GreatExpectationsOperator` can now be satisfied with an Ephemeral or Cloud Data Context with either the `GXValidateDataFrameOperator` or the `GXValidateBatchOperator` to minimize configuration.
@@ -30,50 +30,50 @@ If you want to update your existing `GreatExpectationsOperator` configuration to
 
    Here is a basic example for running Airflow in a stable file system where you can rely on your GX project being discoverable at the same place over multiple runs. This is important because GX will write Validation Results back to the project directory.
 
-    ```
-    import great_expectatations as gx
-    from great_expectations.data_context import FileDataContext
+   ```python
+   import great_expectatations as gx
+   from great_expectations.data_context import FileDataContext
 
-    def configure_file_data_context() -> FileDataContext:
-        return gx.get_context(
-            mode="file",
-            project_root_dir="./path_to_your_existing_project"
-        )
-    ```
+   def configure_file_data_context() -> FileDataContext:
+       return gx.get_context(
+           mode="file",
+           project_root_dir="./path_to_your_existing_project"
+       )
+   ```
 
-    Here's a more advanced example for running Airflow in an environment where the underlying file system is not stable. The steps here are as follows:
-    - fetch your GX project
-    - load the context
-    - yield the context to the Operator
-    - after the Operator has finished, write your project configuration back to the remote
+   Here's a more advanced example for running Airflow in an environment where the underlying file system is not stable. The steps here are as follows:
+   - fetch your GX project
+   - load the context
+   - yield the context to the Operator
+   - after the Operator has finished, write your project configuration back to the remote
 
-    Be aware that you are responsible for managing concurrency, in the case that multiple tasks are reading and writing back to the remote simultaneously.
+   Be aware that you are responsible for managing concurrency, in the case that multiple tasks are reading and writing back to the remote simultaneously.
 
-    ```
-    import great_expectatations as gx
-    from great_expectations.data_context import FileDataContext
+   ```python
+   import great_expectatations as gx
+   from great_expectations.data_context import FileDataContext
 
-    def configure_file_data_context() -> FileDataContext:
-        # load your GX project from its remote source
-        yield gx.get_context(
-            mode="file",
-            project_root_dir="./path_to_the_local_copy_of_your_existing_project"
-        )
-        # write your GX project back to its remote source
-    ```
+   def configure_file_data_context() -> FileDataContext:
+       # load your GX project from its remote source
+       yield gx.get_context(
+           mode="file",
+           project_root_dir="./path_to_the_local_copy_of_your_existing_project"
+       )
+       # write your GX project back to its remote source
+   ```
 
 3. Write a function that returns your Checkpoint.
 
-    ```
-    from great_expectations import Checkpoint
-    from great_expectations.data_context import AbstractDataContext
+   ```python
+   from great_expectations import Checkpoint
+   from great_expectations.data_context import AbstractDataContext
 
-    def configure_checkpoint(context: AbstractDataContext) -> Checkpoint:
-        return context.checkpoints.get(name="<YOUR CHECKPOINT NAME>")
-    ```
+   def configure_checkpoint(context: AbstractDataContext) -> Checkpoint:
+       return context.checkpoints.get(name="<YOUR CHECKPOINT NAME>")
+   ```
 
-- See [getting started](getting-started.md) for more information about required and optional configuration.
-- Explore [examples](https://github.com/great-expectations/airflow-provider-great-expectations/tree/docs/great_expectations_provider/example_dags) of end-to-end configuration and usage.
+  - See [getting started](getting-started.md) for more information about required and optional configuration.
+  - Explore [examples](https://github.com/great-expectations/airflow-provider-great-expectations/tree/docs/great_expectations_provider/example_dags) of end-to-end configuration and usage.
 
 
 ## Migrate Connections
