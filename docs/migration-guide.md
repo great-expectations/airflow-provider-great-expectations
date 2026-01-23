@@ -125,15 +125,14 @@ def configure_batch_definition(context: AbstractDataContext) -> BatchDefinition:
     snowflake_config = build_snowflake_key_connection(conn_id="snowflake_conn_id")
     return (
         context.data_sources.add_snowflake(
-            name="snowflake sandbox",
+            name="snowflake example",
             account=snowflake_config.account,
             user=snowflake_config.user,
             role=snowflake_config.role,
-            password="<PLACEHOLDER PASSWORD>",  # must be provided to pass validation but will be ignored
+            private_key=snowflake_config.private_key.decode(),
             warehouse=snowflake_config.warehouse,
             database=snowflake_config.database,
             schema=snowflake_config.schema,
-            kwargs={"private_key": snowflake_config.private_key},
         )
         .add_table_asset(name="<SCHEMA.TABLE>", table_name="<TABLE_NAME>")
         .add_batch_definition_whole_table(  # you can also batch by year, month, or day here
