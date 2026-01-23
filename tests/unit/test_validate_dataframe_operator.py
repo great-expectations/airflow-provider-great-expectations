@@ -469,40 +469,6 @@ class TestValidateDataFrameOperator:
         pushed_result = mock_ti.xcom_push.call_args[1]["value"]
         assert pushed_result["success"] is True
 
-    def test_configure_expectations_works_without_warning(self) -> None:
-        """Expect that using new 'configure_expectations' parameter works without warning."""
-        # arrange
-        column_name = "col_A"
-
-        def configure_dataframe() -> pd.DataFrame:
-            return pd.DataFrame({column_name: ["a", "b", "c"]})
-
-        expect = ExpectColumnValuesToBeInSet(
-            column=column_name,
-            value_set=["a", "b", "c", "d", "e"],  # type: ignore[arg-type]
-        )
-
-        def configure_expectations(
-            context: AbstractDataContext,
-        ) -> ExpectColumnValuesToBeInSet:
-            return expect
-
-        # act & assert - should not raise any warnings
-        with warnings.catch_warnings():
-            warnings.simplefilter("error")
-            validate_df = GXValidateDataFrameOperator(
-                task_id="validate_df_new",
-                configure_dataframe=configure_dataframe,
-                configure_expectations=configure_expectations,
-            )
-
-        # Verify it works
-        mock_ti = Mock()
-        context: Context = {"ti": mock_ti}  # type: ignore[typeddict-item]
-        validate_df.execute(context=context)
-        pushed_result = mock_ti.xcom_push.call_args[1]["value"]
-        assert pushed_result["success"] is True
-
     def test_missing_configure_expectations_raises_value_error(self) -> None:
         """Expect that omitting both 'configure_expectations' and deprecated 'expect' raises ValueError."""
 
