@@ -49,15 +49,15 @@ To get the most out of this getting started guide, make sure you have an underst
    pip install "airflow-provider-great-expectations[snowflake]"
    ```
    The following backends are supported as optional dependencies:
-      - `athena`
-      - `azure`
-      - `bigquery`
-      - `gcp`
-      - `mssql`
-      - `postgresql`
-      - `s3`
-      - `snowflake`
-      - `spark`
+    - `athena`
+    - `azure`
+    - `bigquery`
+    - `gcp`
+    - `mssql`
+    - `postgresql`
+    - `s3`
+    - `snowflake`
+    - `spark`
 
 ## Configure an Operator
 
@@ -78,33 +78,50 @@ After deciding [which Operator best fits your use case](#operator-use-cases), fo
     ```python
     from typing import TYPE_CHECKING
 
+    from great_expectations_provider.operators.validate_dataframe import (
+        GXValidateDataFrameOperator,
+    )
+
     if TYPE_CHECKING:
         from pandas import DataFrame
+        from great_expectations import ExpectationSuite
+        from great_expectations.data_context import AbstractDataContext
+        from great_expectations.expectations import Expectation
 
-    def my_data_frame_configuration(): DataFrame:
+    def configure_dataframe() -> DataFrame:
         import pandas as pd  # airflow best practice is to not import heavy dependencies in the top level
-        return pd.read_csv(my_data_file)
+        return pd.read_csv("/path/to/my/data")
+
+    def configure_expectations(context: AbstractDataContext) -> Expectation | ExpectationSuite:
+        from great_expectations import ExpectationSuite
+        return context.suites.add_or_update(
+            ExpectationSuite(
+                name="example expectation suite",
+                expectations=[...]
+            )
+        )
 
     my_data_frame_operator = GXValidateDataFrameOperator(
         task_id="my_data_frame_operator",
-        configure_dataframe=my_data_frame_configuration,
-        expect=my_expectation_suite,
+        configure_dataframe=configure_dataframe,
+        configure_expectations=configure_expectations,
     )
     ```
 
     - **`task_id`**: alphanumeric name used in the Airflow UI and GX Cloud.
     - **`configure_dataframe`**: function that returns a DataFrame to pass data to the Operator.
-    - **`expect`**: either a [single Expectation](https://docs.greatexpectations.io/docs/core/define_expectations/create_an_expectation) or an [Expectation Suite](https://docs.greatexpectations.io/docs/core/define_expectations/organize_expectation_suites) to validate against your data.
+    - **`configure_expectations`**: function that returns either a [single Expectation](https://docs.greatexpectations.io/docs/core/define_expectations/create_an_expectation) or an [Expectation Suite](https://docs.greatexpectations.io/docs/core/define_expectations/organize_expectation_suites) to validate against your data.
     - **`result_format` (optional)**: accepts `BOOLEAN_ONLY`, `BASIC`, `SUMMARY`, or `COMPLETE` to set the [verbosity of returned Validation Results](https://docs.greatexpectations.io/docs/core/trigger_actions_based_on_results/choose_a_result_format/). Defaults to `SUMMARY`.
     - **`context_type` (optional)**: accepts `ephemeral` or `cloud` to set the [Data Context](https://docs.greatexpectations.io/docs/core/set_up_a_gx_environment/create_a_data_context) used by the Operator. Defaults to `ephemeral`, which does not persist results between runs. To save and view Validation Results in GX Cloud, use `cloud` and complete the additional Cloud Data Context configuration below.
 
-    For more details, explore this [end-to-end code sample](https://github.com/great-expectations/airflow-provider-great-expectations/tree/docs/great_expectations_provider/example_dags/example_great_expectations_dag.py#L134-L138).
+   For more details, explore this [end-to-end code sample](https://github.com/great-expectations/airflow-provider-great-expectations/tree/docs/great_expectations_provider/example_dags/example_great_expectations_dag.py#L134-L138).
 
 3. If you use a Cloud Data Context, create a [free GX Cloud account](https://app.greatexpectations.io/) to get your [Cloud credentials](https://docs.greatexpectations.io/docs/cloud/connect/connect_python#get-your-user-access-token-and-organization-id) and then set the following Airflow variables.
 
     - `GX_CLOUD_ACCESS_TOKEN`
     - `GX_CLOUD_ORGANIZATION_ID`
 
+   You can then view and share ValidationResults in the GX Cloud UI.
 
 ### Batch Operator
 
@@ -119,26 +136,105 @@ After deciding [which Operator best fits your use case](#operator-use-cases), fo
 2. Instantiate the Operator with required and optional parameters.
 
     ```python
+    from typing import TYPE_CHECKING
+
+    from great_expectations_provider.operators.validate_batch import (
+        GXValidateBatchOperator,
+    )
+
+    if TYPE_CHECKING:
+        from great_expectations import ExpectationSuite
+        from great_expectations.data_context import AbstractDataContext
+        from great_expectations.expectations import Expectation
+        from great_expectations.core.batch_definition import BatchDefinition
+
+
+    def configure_expectations(context: AbstractDataContext) -> Expectation | ExpectationSuite:
+        from great_expectations import ExpectationSuite
+        return context.suites.add_or_update(
+            ExpectationSuite(
+                name="example expectation suite",
+                expectations=[...]
+            )
+        )
+
+    def configure_postgres_batch_definition(context: AbstractDataContext) -> BatchDefinition:
+        """This function takes a GX Context and returns a BatchDefinition that
+        loads a batch of data from a PostgreSQL table."""
+        return (
+            context.data_sources.add_postgres(
+             name="example data source",
+             connection_string="${POSTGRES_CONNECTION_STRING}",  # load credentials from environment
+            )
+            .add_table_asset(
+             name="example table asset",
+             table_name="my_table",
+            )
+            .add_batch_definition_whole_table(
+                name="example batch definition"
+            )
+        )
+
+
     my_batch_operator = GXValidateBatchOperator(
-        task_id="my_batch_operator",
-        configure_batch_definition=my_batch_definition_function,
-        expect=my_expectation_suite,
+        task_id="my_postgres_batch_operator",
+        configure_batch_definition=configure_postgres_batch_definition,
+        configure_expectations=configure_expectations,
     )
     ```
 
     - **`task_id`**: alphanumeric name used in the Airflow UI and GX Cloud.
     - **`configure_batch_definition`**: function that returns a [BatchDefinition](https://docs.greatexpectations.io/docs/core/connect_to_data/filesystem_data/#create-a-batch-definition) to configure GX to read your data.
-    - **`expect`**: either a [single Expectation](https://docs.greatexpectations.io/docs/core/define_expectations/create_an_expectation) or an [Expectation Suite](https://docs.greatexpectations.io/docs/core/define_expectations/organize_expectation_suites) to validate against your data.
+    - **`configure_expectations`**: function that returns either a [single Expectation](https://docs.greatexpectations.io/docs/core/define_expectations/create_an_expectation) or an [Expectation Suite](https://docs.greatexpectations.io/docs/core/define_expectations/organize_expectation_suites) to validate against your data.
     - **`batch_parameters` (optional)**: dictionary that specifies a [time-based Batch of data](https://docs.greatexpectations.io/docs/core/define_expectations/retrieve_a_batch_of_test_data) to validate your Expectations against. Defaults to the first valid Batch found, which is the most recent Batch (with default sort ascending) or the oldest Batch if the Batch Definition has been configured to sort descending.
     - **`result_format` (optional)**: accepts `BOOLEAN_ONLY`, `BASIC`, `SUMMARY`, or `COMPLETE` to set the [verbosity of returned Validation Results](https://docs.greatexpectations.io/docs/core/trigger_actions_based_on_results/choose_a_result_format/). Defaults to `SUMMARY`.
     - **`context_type` (optional)**: accepts `ephemeral` or `cloud` to set the [Data Context](https://docs.greatexpectations.io/docs/core/set_up_a_gx_environment/create_a_data_context) used by the Operator. Defaults to `ephemeral`, which does not persist results between runs. To save and view Validation Results in GX Cloud, use `cloud` and complete the additional Cloud Data Context configuration below.
 
-    For more details, explore this [end-to-end code sample](https://github.com/great-expectations/airflow-provider-great-expectations/tree/docs/great_expectations_provider/example_dags/example_dag_with_batch_parameters.py#L123-L127).
+   For more details, explore this [end-to-end code sample](https://github.com/great-expectations/airflow-provider-great-expectations/tree/docs/great_expectations_provider/example_dags/example_dag_with_batch_parameters.py#L123-L127).
 
 3. If you use a Cloud Data Context, create a [free GX Cloud account](https://app.greatexpectations.io/) to get your [Cloud credentials](https://docs.greatexpectations.io/docs/cloud/connect/connect_python#get-your-user-access-token-and-organization-id) and then set the following Airflow variables.
 
     - `GX_CLOUD_ACCESS_TOKEN`
     - `GX_CLOUD_ORGANIZATION_ID`
+
+   You can then do the following through the GX Cloud UI:
+    - Create and edit your Data Source
+    - Create and edit your Expectations
+    - view and share ValidationResults
+
+```python
+   from typing import TYPE_CHECKING
+
+   from great_expectations_provider.operators.validate_batch import (
+       GXValidateBatchOperator,
+   )
+
+   if TYPE_CHECKING:
+       from great_expectations import ExpectationSuite
+       from great_expectations.data_context import AbstractDataContext
+       from great_expectations.core.batch_definition import BatchDefinition
+
+
+   def configure_cloud_batch_definition(context: AbstractDataContext) -> BatchDefinition:
+       return context.data_sources.get(
+           name="my cloud data source"
+       ).get_asset(
+           name="my cloud data asset"
+       ).get_batch_definition(
+           name="my cloud batch definition"
+       )
+
+   def configure_cloud_expectation_suite(context: AbstractDataContext) -> ExpectationSuite:
+       return context.suites.get("my cloud expectation suite")
+
+
+   my_batch_operator = GXValidateBatchOperator(
+       task_id="my_cloud_batch_operator",
+       configure_batch_definition=configure_cloud_batch_definition,
+       configure_expectations=configure_cloud_expectation_suite,
+   )
+```
+
 
 ### Checkpoint Operator
 
@@ -153,9 +249,77 @@ After deciding [which Operator best fits your use case](#operator-use-cases), fo
 2. Instantiate the Operator with required and optional parameters.
 
     ```python
+    from typing import TYPE_CHECKING
+    from pathlib import Path
+
+    from great_expectations_provider.operators.validate_checkpoint import (
+        GXValidateCheckpointOperator,
+    )
+
+    if TYPE_CHECKING:
+        from great_expectations import ExpectationSuite, Checkpoint
+        from great_expectations.data_context import AbstractDataContext
+
+
+
+    def configure_csv_checkpoint(context: AbstractDataContext) -> Checkpoint:
+        """This function takes a GX Context and returns a Checkpoint that
+        can load CSV files from the data directory, validate them
+        against an ExpectationSuite, and run Actions."""
+        # import GX objects locally per Airflow best practices
+
+        import great_expectations.expectations as gxe
+        from great_expectations import Checkpoint, ExpectationSuite, ValidationDefinition
+
+        # setup data source, asset, batch definition
+        batch_definition = (
+            context.data_sources.add_pandas_filesystem(
+                name="Load Datasource", base_directory=Path("/path/to/my/data")
+            )
+            .add_csv_asset("Load Asset")
+            .add_batch_definition_monthly(
+                name="Load Batch Definition",
+                regex=r"yellow_tripdata_sample_(?P<year>\d{4})-(?P<month>\d{2}).csv",
+            )
+        )
+        # setup expectation suite
+        expectation_suite = context.suites.add(
+            ExpectationSuite(
+                name="Load ExpectationSuite",
+                expectations=[
+                    gxe.ExpectTableRowCountToBeBetween(
+                        min_value=9000,
+                        max_value=11000,
+                    ),
+                    gxe.ExpectColumnValuesToNotBeNull(column="vendor_id"),
+                    gxe.ExpectColumnValuesToBeBetween(
+                        column="passenger_count", min_value=1, max_value=6
+                    ),
+                ],
+            )
+        )
+        # setup validation definition
+        validation_definition = context.validation_definitions.add(
+            ValidationDefinition(
+                name="Load Validation Definition",
+                data=batch_definition,
+                suite=expectation_suite,
+            )
+        )
+        # setup checkpoint
+        checkpoint = context.checkpoints.add(
+            Checkpoint(
+                name="Load Checkpoint",
+                validation_definitions=[validation_definition],
+                actions=[],
+            )
+        )
+        return checkpoint
+
+
     my_checkpoint_operator = GXValidateCheckpointOperator(
         task_id="my_checkpoint_operator",
-        configure_checkpoint=my_checkpoint_function,
+        configure_checkpoint=configure_csv_checkpoint,
     )
     ```
 
@@ -165,12 +329,40 @@ After deciding [which Operator best fits your use case](#operator-use-cases), fo
     - **`context_type` (optional)**: accepts `ephemeral`, `cloud`, or `file` to set the [Data Context](https://docs.greatexpectations.io/docs/core/set_up_a_gx_environment/create_a_data_context) used by the Operator. Defaults to `ephemeral`, which does not persist results between runs. To save and view Validation Results in GX Cloud, use `cloud` and complete the additional Cloud Data Context configuration below. To manage Validation Results yourself, use `file` and complete the additional File Data Context configuration below.
     - **`configure_file_data_context` (optional)**: function that returns a [FileDataContext](https://docs.greatexpectations.io/docs/core/set_up_a_gx_environment/create_a_data_context?context_type=file). Applicable only when using a File Data Context. See the additional File Data Context configuration below for more information.
 
-    For more details, explore this [end-to-end code sample](https://github.com/great-expectations/airflow-provider-great-expectations/tree/docs/great_expectations_provider/example_dags/example_dag_with_batch_parameters.py#L134-L137).
+   For more details, explore this [end-to-end code sample](https://github.com/great-expectations/airflow-provider-great-expectations/tree/docs/great_expectations_provider/example_dags/example_dag_with_batch_parameters.py#L134-L137).
 
 3. If you use a Cloud Data Context, create a [free GX Cloud account](https://app.greatexpectations.io/) to get your [Cloud credentials](https://docs.greatexpectations.io/docs/cloud/connect/connect_python#get-your-user-access-token-and-organization-id) and then set the following Airflow variables.
 
     - `GX_CLOUD_ACCESS_TOKEN`
     - `GX_CLOUD_ORGANIZATION_ID`
+    -
+   You can then do the following through the GX Cloud UI:
+    - Create and edit your Data Source
+    - Create and edit your Expectations
+    - view and share ValidationResults
+
+```python
+   from typing import TYPE_CHECKING
+
+   from great_expectations_provider.operators.validate_checkpoint import (
+       GXValidateCheckpointOperator,
+   )
+
+   if TYPE_CHECKING:
+       from great_expectations.data_context import AbstractDataContext
+       from great_expectations import Checkpoint
+
+
+   def configure_cloud_checkpoint(context: AbstractDataContext) -> Checkpoint:
+       return context.checkpoints.get("my cloud checkpoint")
+
+
+   my_batch_operator = GXValidateCheckpointOperator(
+       task_id="my_cloud_batch_operator",
+       configure_batch_definition=configure_cloud_checkpoint,
+
+   )
+```
 
 4. If you use a File Data Context, pass the `configure_file_data_context` parameter. This takes a function that returns a [FileDataContext](https://docs.greatexpectations.io/docs/core/set_up_a_gx_environment/create_a_data_context?context_type=file). By default, GX will write results in the configuration directory. If you are retrieving your FileDataContext from a remote location, you can yield the FileDataContext in the `configure_file_data_context` function and write the directory back to the remote after control is returned to the generator.
 
@@ -201,38 +393,38 @@ Then, import the function you need from `great_expectations_provider.common.exte
 and use it within your `configure_batch_definition` or `configure_checkpoint` function.
 
 ```python
-from __future__ import annotations
+   from __future__ import annotations
 
-from typing import TYPE_CHECKING
+   from typing import TYPE_CHECKING
 
-from great_expectations_provider.common.external_connections import (
-   build_postgres_connection_string,
-)
-
-if TYPE_CHECKING:
-   from great_expectations.data_context import AbstractDataContext
-   from great_expectations.core.batch_definition import BatchDefinition
-
-
-def configure_postgres_batch_definition(
-        context: AbstractDataContext,
-) -> BatchDefinition:
-   task_id = "example_task"
-   table_name = "example_table"
-   postgres_conn_id = "example_conn_id"
-   return (
-      context.data_sources.add_postgres(
-         name=task_id,
-         connection_string=build_postgres_connection_string(
-            conn_id=postgres_conn_id
-         ),
-      )
-      .add_table_asset(
-         name=task_id,
-         table_name=table_name,
-      )
-      .add_batch_definition_whole_table(task_id)
+   from great_expectations_provider.common.external_connections import (
+       build_postgres_connection_string,
    )
+
+   if TYPE_CHECKING:
+       from great_expectations.data_context import AbstractDataContext
+       from great_expectations.core.batch_definition import BatchDefinition
+
+
+   def configure_postgres_batch_definition(
+           context: AbstractDataContext,
+   ) -> BatchDefinition:
+       task_id = "example_task"
+       table_name = "example_table"
+       postgres_conn_id = "example_conn_id"
+       return (
+           context.data_sources.add_postgres(
+               name=task_id,
+               connection_string=build_postgres_connection_string(
+                   conn_id=postgres_conn_id
+               ),
+           )
+           .add_table_asset(
+               name=task_id,
+               table_name=table_name,
+           )
+           .add_batch_definition_whole_table(task_id)
+       )
 
 ```
 
