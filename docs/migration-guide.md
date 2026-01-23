@@ -132,7 +132,7 @@ def configure_batch_definition(context: AbstractDataContext) -> BatchDefinition:
             private_key=snowflake_config.private_key.decode(),
             warehouse=snowflake_config.warehouse,
             database=snowflake_config.database,
-            schema=snowflake_config.schema,
+            schema=snowflake_config.schema_name,
         )
         .add_table_asset(name="<SCHEMA.TABLE>", table_name="<TABLE_NAME>")
         .add_batch_definition_whole_table(  # you can also batch by year, month, or day here
