@@ -13,8 +13,10 @@ def deploy_docs(deploy_type: str):
 
     if deploy_type == "release":
         if _version.pre is not None:
+            # Pre-releases go to dev branch, never update latest alias
             command = ["mike", "deploy", "--push", "dev"]
         else:
+            # Stable releases: deploy version and update latest alias to point to it
             command = [
                 "mike",
                 "deploy",
