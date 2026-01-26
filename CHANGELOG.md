@@ -1,5 +1,18 @@
 # Apache Airflow Provider for Great Expectations
 
+## 1.0.0 (2026-01-26)
+* [FEATURE] Workspace ID + GXCloud connection by @joshua-stauffer in #222
+* [FEATURE] Refactor `expect` parameter to `configure_expectations` by @joshua-stauffer in #229
+* [MAINTENANCE] Update core dependencies by @joshua-stauffer in #221
+* [MAINTENANCE] Add upper bounds for Airflow and GX by @NathanFarmer in #227
+* [MAINTENANCE] Resolve zizmor alerts - credential persistance, overly broad permissions and unpinned actions by @pankajkoti in #214
+* [MAINTENANCE] CI: Add GitHub CodeQL analysis workflow by @pankajkoti in #210
+* [MAINTENANCE] Add Zizmor analysis GitHub action by @pankajkoti in #209
+* [MAINTENANCE] pre-commit-ci bot updates in #211, #213, #215, #217, #218, #219, #220, #223
+* [DOCUMENTATION] Update CI to publish docs to GX GitHub Pages by @NathanFarmer in #228
+* [DOCUMENTATION] Improve and document integration test setup by @NathanFarmer in #226
+* [DOCUMENTATION] Add release process documentation by @NathanFarmer in #231
+
 ## 1.0.0a5 (2025-07-15)
 * [FEATURE] Support external airflow connections by @joshua-stauffer in #201
 * [BUGFIX] Raise error on validation failure by @joshua-stauffer in #196

@@ -12,20 +12,20 @@ def deploy_docs(deploy_type: str):
     set_default = False
 
     if deploy_type == "release":
-        # TODO: Re-enable this if else block when we are out of pre-release and mark a stable release 1.0.0
-        # Tracking ticket: https://github.com/great-expectations/airflow-provider-great-expectations/issues/187
-        # if _version.pre is not None:
-        #     command = ["mike", "deploy", "--push", "dev"]
-        # else:
-        command = [
-            "mike",
-            "deploy",
-            "--push",
-            "--update-aliases",
-            str(_version),
-            "latest",
-        ]
-        set_default = True
+        if _version.pre is not None:
+            # Pre-releases go to dev branch, never update latest alias
+            command = ["mike", "deploy", "--push", "dev"]
+        else:
+            # Stable releases: deploy version and update latest alias to point to it
+            command = [
+                "mike",
+                "deploy",
+                "--push",
+                "--update-aliases",
+                str(_version),
+                "latest",
+            ]
+            set_default = True
     else:
         command = ["mike", "deploy", "--push", "dev"]
 
