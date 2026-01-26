@@ -11,7 +11,7 @@
 * [MAINTENANCE] pre-commit-ci bot updates in #211, #213, #215, #217, #218, #219, #220, #223
 * [DOCUMENTATION] Update CI to publish docs to GX GitHub Pages by @NathanFarmer in #228
 * [DOCUMENTATION] Improve and document integration test setup by @NathanFarmer in #226
-* [DOCUMENTATION] Add release process documentation by @NathanFarmer
+* [DOCUMENTATION] Add release process documentation by @NathanFarmer in #231
 
 ## 1.0.0a5 (2025-07-15)
 * [FEATURE] Support external airflow connections by @joshua-stauffer in #201
