@@ -23,8 +23,6 @@ Follow [Semantic Versioning](https://semver.org/):
 
 ### 2. Update CHANGELOG.md
 
-**Note**: This step is currently manual. There is no automation for updating the changelog.
-
 Add a new entry to `CHANGELOG.md` with:
 - Version number and date
 - List of changes grouped by type (FEATURE, BUGFIX, MAINTENANCE, DOCUMENTATION, etc.)
