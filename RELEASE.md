@@ -8,8 +8,6 @@ Releases are triggered by creating a GitHub Release. The workflow automatically 
 
 ### 1. Update Version
 
-**Note**: This step is currently manual. There is no automation for version updates.
-
 Update the version in `great_expectations_provider/__init__.py`:
 
 ```python
