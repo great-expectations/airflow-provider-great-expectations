@@ -297,7 +297,7 @@ After deciding [which Operator best fits your use case](#operator-use-cases), fo
     - `GX_CLOUD_WORKSPACE_ID`
 
     When using GX Cloud, you can define your configuration in code like the example above, or you can use the Cloud UI to create and edit your configuration.
-    GX Cloud automatically creates a Checkpoint for you when you configure a Data Source.
+    GX Cloud automatically creates a Checkpoint for you when you configure a Data Asset.
     You can find the name of this Checkpoint in the Cloud UI by selecting your Data Asset, navigating to the Validations tab, clicking the `</>` button in the upper right, and selecting Generate Snippet.
     The `GXValidateCheckpointOperator` creates an XCom that contains a link to view your results in the GX Cloud UI.
 
