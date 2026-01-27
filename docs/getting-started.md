@@ -200,7 +200,7 @@ After deciding [which Operator best fits your use case](#operator-use-cases), fo
     - `GX_CLOUD_WORKSPACE_ID`
 
     When using GX Cloud, you can define your configuration in code like the example above, or you can use the Cloud UI to create and edit your configuration.
-    GX Cloud automatically creates a Batch Definition and Expectation Suite for you when you configure a Data Source.
+    GX Cloud automatically creates a Batch Definition and Expectation Suite for you when you configure a Data Asset.
     You can find the names of these default resources by inspecting your GX configuration with the Python API.
     The `GXValidateBatchOperator` creates an XCom that contains a link to view your results in the GX Cloud UI.
 
