@@ -120,8 +120,9 @@ After deciding [which Operator best fits your use case](#operator-use-cases), fo
 
     - `GX_CLOUD_ACCESS_TOKEN`
     - `GX_CLOUD_ORGANIZATION_ID`
+    - `GX_CLOUD_WORKSPACE_ID`
 
-   You can then view and share ValidationResults in the GX Cloud UI.
+   The GXValidateDataFrameOperator creates an XCom which contains a link to view your results in the GX Cloud UI.
 
 ### Batch Operator
 
@@ -192,49 +193,16 @@ After deciding [which Operator best fits your use case](#operator-use-cases), fo
 
    For more details, explore this [end-to-end code sample](https://github.com/great-expectations/airflow-provider-great-expectations/tree/docs/great_expectations_provider/example_dags/example_dag_with_batch_parameters.py#L123-L127).
 
-3. If you use a Cloud Data Context, create a [free GX Cloud account](https://app.greatexpectations.io/) to get your [Cloud credentials](https://docs.greatexpectations.io/docs/cloud/connect/connect_python#get-your-user-access-token-and-organization-id) and then set the following Airflow variables.
+3.  If you use a Cloud Data Context, create a [free GX Cloud account](https://app.greatexpectations.io/) to get your [Cloud credentials](https://docs.greatexpectations.io/docs/cloud/connect/connect_python#get-your-user-access-token-and-organization-id) and then set the following Airflow variables.
 
     - `GX_CLOUD_ACCESS_TOKEN`
     - `GX_CLOUD_ORGANIZATION_ID`
+    - `GX_CLOUD_WORKSPACE_ID`
 
-   You can then do the following through the GX Cloud UI:
-    - Create and edit your Data Source
-    - Create and edit your Expectations
-    - view and share ValidationResults
-
-```python
-   from typing import TYPE_CHECKING
-
-   from great_expectations_provider.operators.validate_batch import (
-       GXValidateBatchOperator,
-   )
-
-   if TYPE_CHECKING:
-       from great_expectations import ExpectationSuite
-       from great_expectations.data_context import AbstractDataContext
-       from great_expectations.core.batch_definition import BatchDefinition
-
-
-   def configure_cloud_batch_definition(context: AbstractDataContext) -> BatchDefinition:
-       return context.data_sources.get(
-           name="my cloud data source"
-       ).get_asset(
-           name="my cloud data asset"
-       ).get_batch_definition(
-           name="my cloud batch definition"
-       )
-
-   def configure_cloud_expectation_suite(context: AbstractDataContext) -> ExpectationSuite:
-       return context.suites.get("my cloud expectation suite")
-
-
-   my_batch_operator = GXValidateBatchOperator(
-       task_id="my_cloud_batch_operator",
-       configure_batch_definition=configure_cloud_batch_definition,
-       configure_expectations=configure_cloud_expectation_suite,
-   )
-```
-
+    When using GX Cloud, you can define your configuration in code like the example above, or you can use the Cloud UI to create and edit your configuration.
+    GX Cloud automatically creates a Batch Definition and Expectation Suite for you when you configure a Data Source.
+    You can find the names of these default resources by inspecting your GX configuration with the Python API.
+    The GXValidateBatchOperator creates an XCom which contains a link to view your results in the GX Cloud UI.
 
 ### Checkpoint Operator
 
@@ -271,7 +239,7 @@ After deciding [which Operator best fits your use case](#operator-use-cases), fo
         import great_expectations.expectations as gxe
         from great_expectations import Checkpoint, ExpectationSuite, ValidationDefinition
 
-        # setup data source, asset, batch definition
+        # Set up data source, asset, batch definition
         batch_definition = (
             context.data_sources.add_pandas_filesystem(
                 name="Load Datasource", base_directory=Path("/path/to/my/data")
@@ -282,23 +250,14 @@ After deciding [which Operator best fits your use case](#operator-use-cases), fo
                 regex=r"yellow_tripdata_sample_(?P<year>\d{4})-(?P<month>\d{2}).csv",
             )
         )
-        # setup expectation suite
+        # Set up expectation suite
         expectation_suite = context.suites.add(
             ExpectationSuite(
                 name="Load ExpectationSuite",
-                expectations=[
-                    gxe.ExpectTableRowCountToBeBetween(
-                        min_value=9000,
-                        max_value=11000,
-                    ),
-                    gxe.ExpectColumnValuesToNotBeNull(column="vendor_id"),
-                    gxe.ExpectColumnValuesToBeBetween(
-                        column="passenger_count", min_value=1, max_value=6
-                    ),
-                ],
+                expectations=[...],
             )
         )
-        # setup validation definition
+        # Set up validation definition
         validation_definition = context.validation_definitions.add(
             ValidationDefinition(
                 name="Load Validation Definition",
@@ -306,7 +265,7 @@ After deciding [which Operator best fits your use case](#operator-use-cases), fo
                 suite=expectation_suite,
             )
         )
-        # setup checkpoint
+        # Set up checkpoint
         checkpoint = context.checkpoints.add(
             Checkpoint(
                 name="Load Checkpoint",
@@ -335,34 +294,12 @@ After deciding [which Operator best fits your use case](#operator-use-cases), fo
 
     - `GX_CLOUD_ACCESS_TOKEN`
     - `GX_CLOUD_ORGANIZATION_ID`
-    -
-   You can then do the following through the GX Cloud UI:
-    - Create and edit your Data Source
-    - Create and edit your Expectations
-    - view and share ValidationResults
+    - `GX_CLOUD_WORKSPACE_ID`
 
-```python
-   from typing import TYPE_CHECKING
-
-   from great_expectations_provider.operators.validate_checkpoint import (
-       GXValidateCheckpointOperator,
-   )
-
-   if TYPE_CHECKING:
-       from great_expectations.data_context import AbstractDataContext
-       from great_expectations import Checkpoint
-
-
-   def configure_cloud_checkpoint(context: AbstractDataContext) -> Checkpoint:
-       return context.checkpoints.get("my cloud checkpoint")
-
-
-   my_batch_operator = GXValidateCheckpointOperator(
-       task_id="my_cloud_batch_operator",
-       configure_batch_definition=configure_cloud_checkpoint,
-
-   )
-```
+    When using GX Cloud, you can define your configuration in code like the example above, or you can use the Cloud UI to create and edit your configuration.
+    GX Cloud automatically creates a Checkpoint for you when you configure a Data Source.
+    You can find the name of this Checkpoint in the Cloud UI by selecting your Data Asset, navigating to the Validations tab, clicking the `</>` button in the upper right, and selecting Generate Snippet.
+    The GXValidateCheckpointOperator creates an XCom which contains a link to view your results in the GX Cloud UI.
 
 4. If you use a File Data Context, pass the `configure_file_data_context` parameter. This takes a function that returns a [FileDataContext](https://docs.greatexpectations.io/docs/core/set_up_a_gx_environment/create_a_data_context?context_type=file). By default, GX will write results in the configuration directory. If you are retrieving your FileDataContext from a remote location, you can yield the FileDataContext in the `configure_file_data_context` function and write the directory back to the remote after control is returned to the generator.
 
@@ -433,7 +370,7 @@ and use it within your `configure_batch_definition` or `configure_checkpoint` fu
 
 After configuring an Operator, add it to a DAG. Explore our [example DAGs](https://github.com/great-expectations/airflow-provider-great-expectations/tree/docs/great_expectations_provider/example_dags), which have sample tasks that demonstrate Operator functionality.
 
-Note that the shape of the Validation Results depends on both the Operator type and whether or not you set the optional `result_format` parameter.
+Note that the shape of the Validation Results depends on both the Operator type and Result Format configuration.
 - `GXValidateDataFrameOperator` and `GXValidateBatchOperator` return a serialized [ExpectationSuiteValidationResult](https://docs.greatexpectations.io/docs/reference/api/core/expectationsuitevalidationresult_class/)
 - `GXValidateCheckpointOperator` returns a [CheckpointResult](https://docs.greatexpectations.io/docs/reference/api/checkpoint/CheckpointResult_class).
 - The included fields depend on the [Result Format verbosity](https://docs.greatexpectations.io/docs/core/trigger_actions_based_on_results/choose_a_result_format/?results=verbosity#validation-results-reference-tables).

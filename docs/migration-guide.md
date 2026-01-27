@@ -1,5 +1,3 @@
-from great_expectations.expectations import Expectation
-
 # Migration guide
 
 This guide will help you migrate from V0 to V1 of the Great Expectations Airflow Provider.
