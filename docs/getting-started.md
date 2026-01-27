@@ -122,7 +122,7 @@ After deciding [which Operator best fits your use case](#operator-use-cases), fo
     - `GX_CLOUD_ORGANIZATION_ID`
     - `GX_CLOUD_WORKSPACE_ID`
 
-   The GXValidateDataFrameOperator creates an XCom which contains a link to view your results in the GX Cloud UI.
+   The `GXValidateDataFrameOperator` creates an XCom that contains a link to view your results in the GX Cloud UI.
 
 ### Batch Operator
 
