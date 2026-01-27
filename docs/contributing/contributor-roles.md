@@ -33,7 +33,7 @@ Committers have the same responsibilities as standard contributors and also perf
 
 If you know you are not going to be able to contribute for a long time (for instance, due to a change of job or circumstances), you should inform other maintainers, and we will mark you as "emeritus".
 Emeritus committers will no longer have write access to the repo.
-As merit earned never expires, once an emeritus committer becomes active again, they can email a maintainer from Astronomer and ask to be reinstated.
+As merit earned never expires, once an emeritus committer becomes active again, they can email a maintainer from Great Expectations and ask to be reinstated.
 
 ### Prerequisites to becoming a committer
 
@@ -44,5 +44,5 @@ General prerequisites that we look for in all candidates:
 3. Contributes to community health and project's sustainability for the long term
 4. Understands the project's [contributors' guidelines](./contributing-guide.md)
 
-Astronomer is responsible and accountable for releasing new versions of the Great Expectations Airflow Provider in [PyPI](https://pypi.org/project/airflow-provider-great-expectations/), following the [milestones](https://github.com/great-expectations/airflow-provider-great-expectations/milestones).
-Astronomer has the right to grant and revoke write access permissions to the project's official repository for any reason it sees fit.
+Great Expectations is responsible and accountable for releasing new versions of the Great Expectations Airflow Provider in [PyPI](https://pypi.org/project/airflow-provider-great-expectations/), following the [milestones](https://github.com/great-expectations/airflow-provider-great-expectations/milestones).
+Great Expectations has the right to grant and revoke write access permissions to the project's official repository for any reason it sees fit.
