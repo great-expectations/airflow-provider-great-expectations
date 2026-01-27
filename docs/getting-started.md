@@ -299,7 +299,7 @@ After deciding [which Operator best fits your use case](#operator-use-cases), fo
     When using GX Cloud, you can define your configuration in code like the example above, or you can use the Cloud UI to create and edit your configuration.
     GX Cloud automatically creates a Checkpoint for you when you configure a Data Source.
     You can find the name of this Checkpoint in the Cloud UI by selecting your Data Asset, navigating to the Validations tab, clicking the `</>` button in the upper right, and selecting Generate Snippet.
-    The GXValidateCheckpointOperator creates an XCom which contains a link to view your results in the GX Cloud UI.
+    The `GXValidateCheckpointOperator` creates an XCom that contains a link to view your results in the GX Cloud UI.
 
 4. If you use a File Data Context, pass the `configure_file_data_context` parameter. This takes a function that returns a [FileDataContext](https://docs.greatexpectations.io/docs/core/set_up_a_gx_environment/create_a_data_context?context_type=file). By default, GX will write results in the configuration directory. If you are retrieving your FileDataContext from a remote location, you can yield the FileDataContext in the `configure_file_data_context` function and write the directory back to the remote after control is returned to the generator.
 
