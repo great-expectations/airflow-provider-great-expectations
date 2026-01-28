@@ -88,6 +88,10 @@ lint.select = [
     "I",
     "TC",
 ]
+# Ignore E501 (line too long) for docs files since markdown code blocks often contain long lines
+lint.per-file-ignores = {
+    "docs/**": ["E501"]
+}
 
 [tool.distutils.bdist_wheel]
 universal = true
