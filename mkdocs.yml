@@ -32,12 +32,11 @@ extra:
     provider: mike
 
 markdown_extensions:
-  - tables
-  - md_in_html
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
       pygments_lang_class: true
+  - pymdownx.inlinehilite
   - pymdownx.snippets:
       check_paths: true
       base_path: [ "." ]

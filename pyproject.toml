@@ -89,9 +89,6 @@ select = [
     "TC",
 ]
 
-[tool.ruff.lint.per-file-ignores]
-"docs/**" = ["E501"]  # Line too long: markdown code blocks often contain long lines
-
 [tool.distutils.bdist_wheel]
 universal = true
 
