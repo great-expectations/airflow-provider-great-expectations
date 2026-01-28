@@ -83,8 +83,8 @@ exclude = ["env/", ".env/","venv/", ".venv/", "build/"]
 follow_untyped_imports = true
 check_untyped_defs = true
 
-[tool.ruff.lint]
-select = [
+[tool.ruff]
+lint.select = [
     "I",
     "TC",
 ]
