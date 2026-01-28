@@ -83,15 +83,14 @@ exclude = ["env/", ".env/","venv/", ".venv/", "build/"]
 follow_untyped_imports = true
 check_untyped_defs = true
 
-[tool.ruff]
-lint.select = [
+[tool.ruff.lint]
+select = [
     "I",
     "TC",
 ]
-# Ignore E501 (line too long) for docs files since markdown code blocks often contain long lines
-lint.per-file-ignores = {
-    "docs/**": ["E501"]
-}
+
+[tool.ruff.lint.per-file-ignores]
+"docs/**" = ["E501"]  # Line too long: markdown code blocks often contain long lines
 
 [tool.distutils.bdist_wheel]
 universal = true
