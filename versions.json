@@ -10,25 +10,5 @@
     "aliases": [
       "latest"
     ]
-  },
-  {
-    "version": "1.0.0a5",
-    "title": "1.0.0a5",
-    "aliases": []
-  },
-  {
-    "version": "1.0.0a4",
-    "title": "1.0.0a4",
-    "aliases": []
-  },
-  {
-    "version": "1.0.0a3",
-    "title": "1.0.0a3",
-    "aliases": []
-  },
-  {
-    "version": "1.0.0a2",
-    "title": "1.0.0a2",
-    "aliases": []
   }
 ]
