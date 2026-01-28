@@ -53,22 +53,22 @@ After the PR is merged to `main`, create a git tag on the `main` branch matching
 ```bash
 git checkout main
 git pull origin main
-git tag -a vX.Y.Z -m "Release version X.Y.Z"
-git push origin vX.Y.Z
+git tag -a X.Y.Z -m "Release version X.Y.Z"
+git push origin X.Y.Z
 ```
 
-**Important**: 
-- The tag must be created on the `main` branch (after merging), not on a PR branch
-- The tag name must match the version in `__init__.py` exactly (without the `v` prefix in the version file, but with `v` prefix in the tag)
+**Important**: The tag name must match the version in `__init__.py` exactly (e.g., if version is `1.0.0`, tag should be `1.0.0`).
 
 ### 5. Create GitHub Release
 
 1. Go to the [GitHub Releases page](https://github.com/great-expectations/airflow-provider-great-expectations/releases)
 2. Click "Draft a new release"
-3. Select the tag you just created (e.g., `vX.Y.Z`)
+3. Select the tag you just created (e.g., `X.Y.Z`)
 4. Set the release title to the version (e.g., `X.Y.Z`)
-5. Copy the changelog entry for this version into the release description
-6. Click "Publish release"
+5. Click "Choose a previous tag to compare" and select the previous release tag (e.g., `1.0.0a5`)
+6. Click "Generate release notes" - GitHub will automatically generate the release description from merged PRs
+7. Review and edit the generated notes if needed
+8. Click "Publish release"
 
 ### 6. Automated Publishing
 
