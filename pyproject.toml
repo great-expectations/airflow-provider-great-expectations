@@ -55,6 +55,7 @@ spark = [
     "pyarrow>=4.0.0",
     "setuptools",  # pyspark needs distutils, removed in Python 3.12
 ]
+trino = ["great-expectations[trino]>=1.7.0, <2"]
 tests = [
     "pytest==8.3.4",
     "pytest-mock==3.14.0"

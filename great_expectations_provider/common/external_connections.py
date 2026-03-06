@@ -6,6 +6,7 @@ from Airflow connections.
 import logging
 from pathlib import Path
 from typing import Literal, Optional, Union
+from urllib.parse import quote_plus, urlencode
 
 try:  # airflow 3
     from airflow.sdk import BaseHook
@@ -448,3 +449,48 @@ def build_aws_connection_string(
         return (
             f"awsathena+rest://@athena.{region}.amazonaws.com/?s3_staging_dir={s3_path}"
         )
+
+
+def build_trino_connection_string(
+    conn_id: str,
+    schema: Optional[str] = None,
+    catalog: Optional[str] = None,
+) -> str:
+    """
+    Build connection string for Trino connections.
+
+    Args:
+        conn_id: Airflow connection ID
+        schema: Optional schema override
+        catalog: Optional catalog override (defaults to "hive")
+
+    Returns:
+        Connection string for Trino
+
+    Raises:
+        ValueError: If connection doesn't exist
+    """
+    conn = get_connection_by_id(conn_id=conn_id)
+
+    effective_catalog = catalog or conn.extra_dejson.get("catalog", "hive")
+
+    userinfo = ""
+    if conn.login:
+        userinfo = quote_plus(conn.login)
+        if conn.password:
+            userinfo += f":{quote_plus(conn.password)}"
+        userinfo += "@"
+
+    host_port = conn.host or "localhost"
+    if conn.port:
+        host_port += f":{conn.port}"
+
+    path = f"/{effective_catalog}"
+    effective_schema = schema or conn.schema
+    if effective_schema:
+        path += f"/{effective_schema}"
+
+    extras = {k: v for k, v in conn.extra_dejson.items() if k != "catalog"}
+    query = f"?{urlencode(extras)}" if extras else ""
+
+    return f"trino://{userinfo}{host_port}{path}{query}"

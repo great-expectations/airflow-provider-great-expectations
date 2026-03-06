@@ -17,6 +17,7 @@ from great_expectations_provider.common.external_connections import (
     build_snowflake_connection_string,
     build_snowflake_key_connection,
     build_sqlite_connection_string,
+    build_trino_connection_string,
 )
 
 
@@ -710,4 +711,123 @@ class TestAWSConnectionString:
         )
 
         expected = "awsathena+rest://@athena.us-east-1.amazonaws.com/schema_override?s3_staging_dir=s3://bucket/path/"
+        assert result == expected
+
+
+class TestTrinoConnectionString:
+    """Test class for Trino connection string."""
+
+    @patch(
+        "great_expectations_provider.common.external_connections.BaseHook.get_connection"
+    )
+    def test_build_trino_connection_string_basic_auth(self, mock_get_connection):
+        """Test Trino connection string with basic authentication."""
+        mock_conn = Mock()
+        mock_conn.login = "user"
+        mock_conn.password = "pass"
+        mock_conn.host = "trino-server.com"
+        mock_conn.port = 8443
+        mock_conn.schema = "default"
+        mock_conn.extra_dejson = {}
+        mock_get_connection.return_value = mock_conn
+
+        result = build_trino_connection_string("test_conn")
+
+        expected = "trino://user:pass@trino-server.com:8443/hive/default"
+        assert result == expected
+
+    @patch(
+        "great_expectations_provider.common.external_connections.BaseHook.get_connection"
+    )
+    def test_build_trino_connection_string_catalog_schema_extra(
+        self, mock_get_connection
+    ):
+        """Test Trino connection with catalog from extras and query params."""
+        mock_conn = Mock()
+        mock_conn.login = "user"
+        mock_conn.password = "pass"
+        mock_conn.host = "trino-server.com"
+        mock_conn.port = 8443
+        mock_conn.schema = "my_schema"
+        mock_conn.extra_dejson = {"catalog": "iceberg", "source": "airflow"}
+        mock_get_connection.return_value = mock_conn
+
+        result = build_trino_connection_string("test_conn")
+
+        expected = (
+            "trino://user:pass@trino-server.com:8443/iceberg/my_schema?source=airflow"
+        )
+        assert result == expected
+
+    @patch(
+        "great_expectations_provider.common.external_connections.BaseHook.get_connection"
+    )
+    def test_build_trino_connection_string_schema_override(self, mock_get_connection):
+        """Test Trino connection with schema and catalog overrides."""
+        mock_conn = Mock()
+        mock_conn.login = "user"
+        mock_conn.password = None
+        mock_conn.host = "trino-server.com"
+        mock_conn.port = None
+        mock_conn.schema = "default"
+        mock_conn.extra_dejson = {"catalog": "iceberg"}
+        mock_get_connection.return_value = mock_conn
+
+        result = build_trino_connection_string(
+            "test_conn", schema="override_schema", catalog="override_catalog"
+        )
+
+        expected = "trino://user@trino-server.com/override_catalog/override_schema"
+        assert result == expected
+
+    @patch(
+        "great_expectations_provider.common.external_connections.BaseHook.get_connection"
+    )
+    def test_build_trino_connection_string_special_chars(self, mock_get_connection):
+        """Test Trino connection with special characters in credentials."""
+        mock_conn = Mock()
+        mock_conn.login = "user@domain"
+        mock_conn.password = "p@ss:word/special"
+        mock_conn.host = "trino-server.com"
+        mock_conn.port = 8443
+        mock_conn.schema = "default"
+        mock_conn.extra_dejson = {}
+        mock_get_connection.return_value = mock_conn
+
+        result = build_trino_connection_string("test_conn")
+
+        assert "user%40domain" in result
+        assert "p%40ss%3Aword%2Fspecial" in result
+        assert result.startswith("trino://user%40domain:p%40ss%3Aword%2Fspecial@")
+
+    @patch(
+        "great_expectations_provider.common.external_connections.BaseHook.get_connection"
+    )
+    def test_build_trino_connection_string_no_connection(self, mock_get_connection):
+        """Test Trino connection string when connection doesn't exist."""
+        mock_get_connection.return_value = None
+
+        with pytest.raises(
+            ValueError,
+            match="Failed to retrieve Airflow connection with conn_id: test_conn",
+        ):
+            build_trino_connection_string("test_conn")
+
+    @patch(
+        "great_expectations_provider.common.external_connections.BaseHook.get_connection"
+    )
+    def test_build_trino_connection_string_anonymous(self, mock_get_connection):
+        """Test Trino connection string without credentials (anonymous access)."""
+        mock_conn = Mock()
+        mock_conn.login = None
+        mock_conn.password = None
+        mock_conn.host = "trino-server.com"
+        mock_conn.port = 8443
+        mock_conn.schema = None
+        mock_conn.extra_dejson = {"catalog": "iceberg"}
+        mock_get_connection.return_value = mock_conn
+
+        result = build_trino_connection_string("test_conn")
+
+        expected = "trino://trino-server.com:8443/iceberg"
         assert result == expected
