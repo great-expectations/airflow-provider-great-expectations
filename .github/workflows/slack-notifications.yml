@@ -1,0 +1,55 @@
+name: "Slack Notifications"
+
+on:
+  issues:
+    types: [opened]
+  pull_request_target: # zizmor: ignore[dangerous-triggers]
+    types: [opened]
+
+permissions: {}
+
+jobs:
+  notify-on-issue:
+    if: github.event_name == 'issues'
+    runs-on: ubuntu-latest
+    environment: notifications
+    permissions: {}
+    steps:
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@b0fa283ad8fea605de13dc3f449259339835fc52 # v2.1.0
+        with:
+          channel-id: C0AMYQ5944C
+          payload: |
+            {
+              "text": "New issue in <${{ github.server_url }}/${{ github.repository }}|${{ github.repository }}>: <${{ github.event.issue.html_url }}|${{ github.event.issue.title }}> opened by ${{ github.event.issue.user.login }}"
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+  notify-on-external-pr:
+    if: github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    environment: notifications
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Check User Permission
+        id: check-permission
+        uses: actions-cool/check-user-permission@7b90a27f92f3961b368376107661682c441f6103 # v2
+        with:
+          require: write
+          username: ${{ github.event.pull_request.user.login }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify Slack
+        if: steps.check-permission.outputs.require-result == 'false'
+        uses: slackapi/slack-github-action@b0fa283ad8fea605de13dc3f449259339835fc52 # v2.1.0
+        with:
+          channel-id: C0AMYQ5944C
+          payload: |
+            {
+              "text": "New PR from external contributor in <${{ github.server_url }}/${{ github.repository }}|${{ github.repository }}>: <${{ github.event.pull_request.html_url }}|${{ github.event.pull_request.title }}> opened by ${{ github.event.pull_request.user.login }}"
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
