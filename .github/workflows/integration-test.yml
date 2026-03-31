@@ -3,27 +3,18 @@ name: "Integration Tests"
 on:
   push: # Run on pushes to the default branch
     branches: [main]
-  pull_request: # Also run on pull requests originated from forks
-    branches: [main]
+  workflow_run: # Run after the trigger workflow completes (handles fork PR approval gate)
+    workflows: ["Integration Tests Trigger"]
+    types: [completed]
 
 # This allows a subsequently queued workflow run to interrupt and cancel previous runs
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'push' && github.ref || github.event.workflow_run.head_sha }}
   cancel-in-progress: true
 
 jobs:
-  Authorize:
-    environment: ${{ github.event_name == 'pull_request' &&
-      github.event.pull_request.head.repo.full_name != github.repository &&
-      'external' || 'internal' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - run: "true"
-
   integration-test:
-    needs: Authorize
+    if: github.event_name == 'push' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -45,8 +36,14 @@ jobs:
 
     steps:
       - name: Checkout
+        # workflow_run: safely checking out fork's head commit for test execution.
+        # The workflow YAML runs from the base repo (workflow_run always uses the
+        # base repo's workflow files), so there is no workflow injection risk.
+        # The human approval gate in the trigger workflow already ran before this.
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          repository: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_repository.full_name || github.repository }}
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
           persist-credentials: false
 
       - name: Set up Python
@@ -79,7 +76,7 @@ jobs:
         run: pytest -vvv -m integration tests/integration
 
   postgres-integration-test:
-    needs: Authorize
+    if: github.event_name == 'push' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -105,8 +102,14 @@ jobs:
 
     steps:
       - name: Checkout
+        # workflow_run: safely checking out fork's head commit for test execution.
+        # The workflow YAML runs from the base repo (workflow_run always uses the
+        # base repo's workflow files), so there is no workflow injection risk.
+        # The human approval gate in the trigger workflow already ran before this.
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          repository: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_repository.full_name || github.repository }}
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
           persist-credentials: false
 
       - name: Set up Python
@@ -131,7 +134,7 @@ jobs:
         run: pytest -vvv -m postgres tests/integration
 
   spark-integration-test:
-    needs: Authorize
+    if: github.event_name == 'push' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -143,8 +146,14 @@ jobs:
 
     steps:
       - name: Checkout
+        # workflow_run: safely checking out fork's head commit for test execution.
+        # The workflow YAML runs from the base repo (workflow_run always uses the
+        # base repo's workflow files), so there is no workflow injection risk.
+        # The human approval gate in the trigger workflow already ran before this.
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          repository: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_repository.full_name || github.repository }}
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
           persist-credentials: false
 
       - name: Start services
@@ -173,7 +182,7 @@ jobs:
         run: pytest -vvv -m spark_integration tests/integration
 
   spark-connect-integration-test:
-    needs: Authorize
+    if: github.event_name == 'push' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -185,8 +194,14 @@ jobs:
 
     steps:
       - name: Checkout
+        # workflow_run: safely checking out fork's head commit for test execution.
+        # The workflow YAML runs from the base repo (workflow_run always uses the
+        # base repo's workflow files), so there is no workflow injection risk.
+        # The human approval gate in the trigger workflow already ran before this.
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          repository: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_repository.full_name || github.repository }}
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
           persist-credentials: false
 
       - name: Start services
