@@ -18,13 +18,13 @@ jobs:
       - name: Notify Slack
         uses: slackapi/slack-github-action@b0fa283ad8fea605de13dc3f449259339835fc52 # v2.1.0
         with:
-          channel-id: C0AMYQ5944C
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
           payload: |
             {
+              "channel": "C0AMYQ5944C",
               "text": "New issue in <${{ github.server_url }}/${{ github.repository }}|${{ github.repository }}>: <${{ github.event.issue.html_url }}|${{ github.event.issue.title }}> opened by ${{ github.event.issue.user.login }}"
             }
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
   notify-on-external-pr:
     if: github.event_name == 'pull_request_target'
@@ -46,10 +46,10 @@ jobs:
         if: steps.check-permission.outputs.require-result == 'false'
         uses: slackapi/slack-github-action@b0fa283ad8fea605de13dc3f449259339835fc52 # v2.1.0
         with:
-          channel-id: C0AMYQ5944C
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
           payload: |
             {
+              "channel": "C0AMYQ5944C",
               "text": "New PR from external contributor in <${{ github.server_url }}/${{ github.repository }}|${{ github.repository }}>: <${{ github.event.pull_request.html_url }}|${{ github.event.pull_request.title }}> opened by ${{ github.event.pull_request.user.login }}"
             }
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
