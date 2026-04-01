@@ -58,6 +58,7 @@ To get the most out of this getting started guide, make sure you have an underst
     - `s3`
     - `snowflake`
     - `spark`
+    - `trino`
 
 ## Configure an Operator
 
@@ -321,6 +322,7 @@ The following external Connections are supported:
 | **Google Cloud BigQuery** | `build_gcpbigquery_connection_string(conn_id, schema=None)` | [Google Cloud Provider](https://airflow.apache.org/docs/apache-airflow-providers-google/stable/connections/gcp.html) |
 | **SQLite** | `build_sqlite_connection_string(conn_id)` | [SQLite Provider](https://airflow.apache.org/docs/apache-airflow-providers-sqlite/stable/connections/sqlite.html) |
 | **AWS Athena** | `build_aws_connection_string(conn_id, schema=None, database=None, s3_path=None, region=None)` | [Amazon Provider](https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/connections/aws.html) |
+| **Trino** | `build_trino_connection_string(conn_id, schema=None, catalog=None)` | [Trino Provider](https://airflow.apache.org/docs/apache-airflow-providers-trino/stable/connections/trino.html) |
 
 #### Usage
 
