@@ -1092,7 +1092,8 @@
     - <code>postgresql</code>
     - <code>s3</code>
     - <code>snowflake</code>
-    - <code>spark</code></p>
+    - <code>spark</code>
+    - <code>trino</code></p>
 <h2 id="configure-an-operator">Configure an Operator</h2>
 <p>After deciding <a href="#operator-use-cases">which Operator best fits your use case</a>, follow the Operator-specific instructions below to configure it.</p>
 <h3 id="data-frame-operator">Data Frame Operator</h3>
@@ -1399,6 +1400,11 @@ The following external Connections are supported:</p>
 <td><strong>AWS Athena</strong></td>
 <td><code>build_aws_connection_string(conn_id, schema=None, database=None, s3_path=None, region=None)</code></td>
 <td><a href="https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/connections/aws.html">Amazon Provider</a></td>
+</tr>
+<tr>
+<td><strong>Trino</strong></td>
+<td><code>build_trino_connection_string(conn_id, schema=None, catalog=None)</code></td>
+<td><a href="https://airflow.apache.org/docs/apache-airflow-providers-trino/stable/connections/trino.html">Trino Provider</a></td>
 </tr>
 </tbody>
 </table>
